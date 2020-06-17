@@ -11,4 +11,4 @@ Steps:
 
 
 * Click Allow it will open the front camera on your browser
-<img width="763" alt="Screen Shot 2020-06-17 at 11 05 51 AM" src="https://user-images.githubusercontent.com/52882728/84915226-87e30900-b08a-11ea-80da-f7cc3b2e8562.png">
+
