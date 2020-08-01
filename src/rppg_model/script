@@ -1,0 +1,3 @@
+tensorflowjs_converter --input_format keras \
+                       ./cv_0_epoch48_model.hdf5 \
+                       .

@@ -1,44 +1,58 @@
 {
-  "name": "rppg",
-  "version": "0.1.0",
-  "private": true,
-  "scripts": {
-    "serve": "vue-cli-service serve",
-    "build": "vue-cli-service build",
-    "lint": "vue-cli-service lint"
-  },
-  "dependencies": {
-    "canvas": "^2.6.1",
-    "core-js": "^3.6.5",
-    "vis-timeline": "^7.3.7",
-    "vue": "^2.6.11"
-  },
-  "devDependencies": {
-    "@vue/cli-plugin-babel": "~4.4.0",
-    "@vue/cli-plugin-eslint": "~4.4.0",
-    "@vue/cli-service": "~4.4.0",
-    "babel-eslint": "^10.1.0",
-    "eslint": "^6.7.2",
-    "eslint-plugin-vue": "^6.2.2",
-    "vue-template-compiler": "^2.6.11"
-  },
-  "eslintConfig": {
-    "root": true,
-    "env": {
-      "node": true
-    },
-    "extends": [
-      "plugin:vue/essential",
-      "eslint:recommended"
-    ],
-    "parserOptions": {
-      "parser": "babel-eslint"
-    },
-    "rules": {}
-  },
-  "browserslist": [
-    "> 1%",
-    "last 2 versions",
-    "not dead"
-  ]
+	"name": "rppg",
+	"version": "0.1.0",
+	"private": true,
+	"scripts": {
+		"serve": "vue-cli-service serve",
+		"build": "vue-cli-service build",
+		"lint": "vue-cli-service lint"
+	},
+	"dependencies": {
+		"@tensorflow/tfjs": "^2.0.1",
+		"@tensorflow/tfjs-node": "^2.0.1",
+		"aws-sdk": "^2.725.0",
+		"babel-loader": "^8.1.0",
+		"canvas": "^2.6.1",
+		"core-js": "^3.6.5",
+		"vis-timeline": "^7.3.7",
+		"vue": "^2.6.11"
+	},
+	"devDependencies": {
+		"@vue/cli-plugin-babel": "~4.4.6",
+		"@vue/cli-plugin-eslint": "~4.4.6",
+		"@vue/cli-service": "~4.4.6",
+		"babel-eslint": "^10.1.0",
+		"css-loader": "^4.2.0",
+		"less-loader": "^6.2.0",
+		"ts-loader": "^8.0.1",
+		"vue-template-compiler": "^2.6.11",
+		"eslint": "^4.15.0",
+		"eslint-config-standard": "^10.2.1",
+		"eslint-friendly-formatter": "^3.0.0",
+		"eslint-loader": "^1.7.1",
+		"eslint-plugin-import": "^2.7.0",
+		"eslint-plugin-node": "^5.2.0",
+		"eslint-plugin-promise": "^3.4.0",
+		"eslint-plugin-standard": "^3.0.1",
+		"eslint-plugin-vue": "^4.0.0"
+	},
+	"eslintConfig": {
+		"root": true,
+		"env": {
+			"node": true
+		},
+		"extends": [
+			"plugin:vue/essential",
+			"eslint:recommended"
+		],
+		"parserOptions": {
+			"parser": "babel-eslint"
+		},
+		"rules": {}
+	},
+	"browserslist": [
+		"> 1%",
+		"last 2 versions",
+		"not dead"
+	]
 }
