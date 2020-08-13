@@ -6,7 +6,7 @@
 </template>
 
 <script>
-import WebCam from './components/HelloWorld.vue'
+import WebCam from './components/LandingPage.vue'
 
 export default {
   name: 'App',

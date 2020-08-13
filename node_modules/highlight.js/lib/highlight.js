@@ -33,8 +33,8 @@ https://highlightjs.org/
       objectKeys = Object.keys;
 
   // Global internal variables used within the highlight.js library.
-  var languages = {},
-      aliases   = {};
+  var languages = Object.create(null),
+      aliases   = Object.create(null);
 
   // safe/production mode - swallows more errors, tries to keep running
   // even if a single syntax or parse hits a fatal error
@@ -707,6 +707,16 @@ https://highlightjs.org/
         mode_buffer += codeToHighlight.slice(match.index, match.index + 1);
         return 1;
       }
+
+      // edge case for when illegal matches $ (end of line) which is technically
+      // a 0 width match but not a begin/end match so it's not caught by the
+      // first handler (when ignoreIllegals is true)
+      // https://github.com/highlightjs/highlight.js/issues/2522
+      if (lastMatch.type==="illegal" && lexeme === "") {
+        mode_buffer += codeToHighlight.slice(match.index, match.index + 1);
+        return 1;
+      }
+
       lastMatch = match;
 
       if (match.type==="begin") {

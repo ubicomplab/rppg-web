@@ -9,23 +9,23 @@
 // Requirements
 //------------------------------------------------------------------------------
 
-const builtInRules = require("../lib/rules");
+const load = require("../lib/load-rules"),
+    Rules = require("../lib/rules");
+const rules = new Rules();
 
 //------------------------------------------------------------------------------
 // Helpers
 //------------------------------------------------------------------------------
 
-const allRules = {};
-
-for (const [ruleId, rule] of builtInRules) {
-    if (!rule.meta.deprecated) {
-        allRules[ruleId] = "error";
+const enabledRules = Object.keys(load()).reduce((result, ruleId) => {
+    if (!rules.get(ruleId).meta.deprecated) {
+        result[ruleId] = "error";
     }
-}
+    return result;
+}, {});
 
 //------------------------------------------------------------------------------
 // Public Interface
 //------------------------------------------------------------------------------
 
-/** @type {import("../lib/shared/types").ConfigData} */
-module.exports = { rules: allRules };
+module.exports = { rules: enabledRules };
