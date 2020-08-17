@@ -12,29 +12,31 @@ export class AttentionMask extends tf.layers.Layer {
 		console.log(inputShape)
 		console.log(this.name)
 		this.inputShape = inputShape;
-		var k = inputShape.slice(0, 3);
+//		var k = inputShape.slice(0, 3);
 		/* eslint-disable no-console */
-		console.log(k[1], 1)
-		return [k[0], k[1], k[2], 1];
+//		console.log(k)
+		return [inputShape[0], inputShape[1], inputShape[2], inputShape[3]];
 	}
 
 	// eslint-disable-next-line
 	call(inputs, kwargs) {
 		/* eslint-disable no-console */
-	//	console.log(this.inputShape)
-		console.log(this.name)
 		console.log(inputs);
-		var input = inputs;
+		var input = inputs[0];
+		console.log(inputs[0].shape);
+		console.log(inputs[0].print(1));
+		console.log(input);
 		
 		/* eslint-disable no-console */
 		//this.invokeCallHook(inputs, kwargs);
 		var inputSum = tf.sum(input, 1, 1);
+		inputSum.print(1);
 		/* eslint-disable no-console */
 		inputSum.print(1);
 		inputSum = tf.sum(inputSum, 2, 1);
-		/* eslint-disable no-console */
-		console.log("inside call");
+
 		var out = input.div(inputSum).mul(0.5);
+		
 		return out;
 	}
 

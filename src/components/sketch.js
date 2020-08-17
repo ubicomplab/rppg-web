@@ -29,10 +29,11 @@ export default function run() {
 		/* eslint-disable no-console */
 		console.log("Successfully loaded ml model");
 	}
-	
+
 	async function processModel() {
-		model = await tf.loadLayersModel(path);
-		var result = model.predict(diffBatch, Batch);
+		var result = model.predict([diffBatch, Batch]);
+		console.log(result);
+		result.print(1);
 		prediction = result;
 	}
 
@@ -76,10 +77,15 @@ export default function run() {
 
 	startVideo();
 	//initialize_chart();
+	var loop_counter = 0;
 
 	function loop() {
-		preprocess();
-		setTimeout(loop, delay);
+
+		if (loop_counter < 22) {
+			loop_counter++;
+			preprocess();
+			setTimeout(loop, delay);
+		}
 	}
 
 	function preprocess() {
@@ -96,7 +102,7 @@ export default function run() {
 			prevFrame = Xsub;
 			/* eslint-disable no-console */
 			console.log("initialize")
-			
+
 		} else {
 			//--------------------------------------
 			// didn't get  only the 300, 300 , ie didn't crop		
@@ -110,31 +116,22 @@ export default function run() {
 			Xsub = tf.div(Xsub, tf.moments(Xsub).variance.sqrt()); // (1, 36, 36, 3)
 			/* eslint-disable no-console */
 			console.log("below is X before mean")
-			console.log(Xsub.print(true));
 
 			prevFrame = Xsub;
 			if (batch_counter == 0) {
 				Batch = tf.cast(Xsub, 'float32');
 				diffBatch = dXsub;
 			} else {
-				Batch.print(true);
-				diffBatch.print(true);
-				
 				Batch = tf.concat([Batch, Xsub]) // note the xsub here is after 
 				diffBatch = tf.concat([diffBatch, dXsub]);
-
+				Batch.print(true);
+				diffBatch.print(true);
 			}
 			batch_counter++;
 		}
 
 		if (batch_counter == batch_size) {
 
-			// call update the chart
-			Batch = tf.transpose(Batch, [2, 1, 3, 0]); // swap axis
-			Batch = tf.expandDims(Batch, 0); // expand dimension
-
-			diffBatch = tf.transpose(diffBatch, [2, 1, 3, 0]); // swap axis
-			diffBatch = tf.expandDims(diffBatch, 0); // expand dimension
 
 			(async () => {
 				await processModel();
@@ -168,8 +165,7 @@ export default function run() {
 	// the chart
 	function addDataPoint() {
 		var now = vis.moment();
-		
-		console.log("inside prediction");
+
 		console.log(prediction);
 		dataset.add([{
 			x: now,
