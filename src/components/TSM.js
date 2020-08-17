@@ -1,6 +1,5 @@
 import * as tf from '@tensorflow/tfjs';
 
-
 export class TSM extends tf.layers.Layer {
 
 	constructor(config) {
@@ -9,10 +8,7 @@ export class TSM extends tf.layers.Layer {
 
 	computeOutputShape(inputShape) {
 		/* eslint-disable no-console */
-	//	console.log("TSM expected outputshape");
-	//	console.log(this.name);
 		console.log(inputShape);
-
 		return inputShape;
 	}
 
@@ -54,21 +50,18 @@ export class TSM extends tf.layers.Layer {
 		out1 = tf.concat([out1, padding1], 1);
 		console.log(out1);
 
-		// shift right
+		// Shift right
 		padding2 = tf.zeros([out2.shape[0], 1, out2.shape[2], out2.shape[3], fold]);
 		[out2, empty] = tf.split(out2, [n_frame - 1, 1], 1);
 		out2 = tf.concat([padding2, out2], 1);
-		console.log(out2);
 
 		out = tf.concat([out1, out2, out3], -1);
-		console.log(out);
 		out = tf.reshape(out, [-1, h, w, c]);
 
 		console.log("TSM is called, following is its output");
 		out.print(1);
 
 		return out;
-
 	}
 
 	getConfig() {
@@ -79,7 +72,7 @@ export class TSM extends tf.layers.Layer {
 	static getClassName() {
 		return 'TSM';
 	}
-
+	
 }
 
 TSM.className = 'TSM'; // static variable
