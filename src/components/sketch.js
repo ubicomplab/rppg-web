@@ -19,10 +19,13 @@ export default function run() {
 	var dim = 36;
 	var prediction;
 	let model;
+	let prediction_rppg;
 
+	// Register Cusomized Layers
 	tf.serialization.registerClass(TSM);
 	tf.serialization.registerClass(AttentionMask);
 
+	// Load ML Model
 	loadModel();
 	async function loadModel() {
 		model = await tf.loadLayersModel(path);
@@ -31,12 +34,19 @@ export default function run() {
 	}
 
 	async function processModel() {
-		var result = model.predict([diffBatch, Batch]);
-		console.log(result);
-		result.print(1);
-		prediction = result;
+		prediction = model.predict([diffBatch, Batch]);
+		prediction_rppg = prediction[0].arraySync();
+	//	var prediction_pulse = prediction[1].arraySync();
+		//rppg = Array.from(rppg);
+		//pulse = Array.from(pulse);
+
+		//	prediction[0].print(1);
+		//	prediction[0].print(2);
+		console.log(prediction[0]);
+		console.log(prediction[1]);
 	}
 
+	// Definition for the line chart 
 	var names = ["uniform"];
 	var groups = new vis.DataSet();
 	var container = document.getElementById("visualization");
@@ -62,7 +72,7 @@ export default function run() {
 	// eslint-disable-next-line
 	var graph2d = new vis.Graph2d(container, dataset, groups, options);
 
-	// could delete the group , just use dataset
+	// Note: could delete the group , just use dataset
 	groups.add({
 		id: 0,
 		content: names[0],
@@ -76,32 +86,34 @@ export default function run() {
 
 
 	startVideo();
-	//initialize_chart();
+
 	var loop_counter = 0;
 
 	function loop() {
-
 		if (loop_counter < 22) {
 			loop_counter++;
 			preprocess();
 			setTimeout(loop, delay);
 		}
+
 	}
 
+
+	// Video data Preprocess
 	function preprocess() {
+
+		// Get the data of original video file
 		orig_v = tf.browser.fromPixels(video);
 
+		// Resize to [1, 36, 36, 3], type float 
 		Xsub = tf.image.resizeBilinear(orig_v, [dim, dim]);
-
 		Xsub = Xsub.asType('float32').div(tf.scalar(255));
 		Xsub = Xsub.expandDims(0); // (1, 36, 36, 3)
-
-
 
 		if (prevFrame == null) {
 			prevFrame = Xsub;
 			/* eslint-disable no-console */
-			console.log("initialize")
+			console.log("initialize");
 
 		} else {
 			//--------------------------------------
@@ -111,11 +123,11 @@ export default function run() {
 			dXsub = tf.div(tf.sub(Xsub, prevFrame), tf.add(Xsub, prevFrame));
 
 			// SUBTRACT MEAN OF IMG:
-			dXsub = tf.div(dXsub, tf.moments(dXsub).variance.sqrt()); // (1, 36, 36, 3)
-			Xsub = tf.sub(Xsub, tf.mean(Xsub));
-			Xsub = tf.div(Xsub, tf.moments(Xsub).variance.sqrt()); // (1, 36, 36, 3)
+			dXsub = tf.div(dXsub, tf.moments(dXsub).variance.sqrt()); // dxsub / np.std(dxsub,ddof=1)
+			Xsub = tf.sub(Xsub, tf.mean(Xsub)); // Xsub = Xsub - Xsub.mean(axis = 0)
+			Xsub = tf.div(Xsub, tf.moments(Xsub).variance.sqrt()); // Xsub = Xsub - Xsub.mean(axis = 0)
 			/* eslint-disable no-console */
-			console.log("below is X before mean")
+			console.log("below is X before mean");
 
 			prevFrame = Xsub;
 			if (batch_counter == 0) {
@@ -163,16 +175,18 @@ export default function run() {
 	}
 
 	// the chart
-	function addDataPoint() {
-		var now = vis.moment();
-
+	function addDataPoint() {	
 		console.log(prediction);
-		dataset.add([{
-			x: now,
-			y: prediction,
-			group: 0
-		}])
-
+		var i = 0;
+		console.log(prediction_rppg[i])
+		while (i < 20) {
+			dataset.add([{
+				x: vis.moment(),
+				y: prediction_rppg[i],
+				group: 0
+			}])
+			i ++;
+		}
 		setTimeout(moveWindow, delay);
 	}
 
