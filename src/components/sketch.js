@@ -13,19 +13,14 @@ export default function run() {
 	var path = "./model.json";
 	var orig_v, Xsub, dXsub, prevFrame;
 	var diffBatch, Batch;
-	var delay = 20;
+	var delay = 10;
 	var batch_size = 20;
 	var batch_counter = 0;
 	var dim = 36;
 	var prediction;
 	let model;
 	let prediction_rppg, prediction_resp;
-
-	// elements for draw the preprocess image
-	//var c = document.getElementById("myCanvas");
-	//var ctx = c.getContext('2d');
-
-
+	var t_start, t_end;
 	// Register Cusomized Layers
 	tf.serialization.registerClass(TSM);
 	tf.serialization.registerClass(AttentionMask);
@@ -36,15 +31,6 @@ export default function run() {
 		model = await tf.loadLayersModel(path);
 		/* eslint-disable no-console */
 		console.log("Successfully loaded ml model");
-	}
-
-	async function processModel() {
-		prediction = model.predict([diffBatch, Batch]);
-		prediction_rppg = prediction[0].cumsum().arraySync();
-		prediction_resp = prediction[1].cumsum().arraySync();
-
-		console.log(prediction_rppg);
-		console.log(prediction_resp);
 	}
 
 	// Definition for the line chart 
@@ -71,11 +57,11 @@ export default function run() {
 		end: vis.moment().add(10, "seconds"),
 
 	};
-	
+
 	// eslint-disable-next-line
 	var graph2d_rppg = new vis.Graph2d(container_rppg, dataset_rppg, groups, options);
 	var graph2d_resp = new vis.Graph2d(container_resp, dataset_resp, groups, options);
-	
+
 
 	// Note: could delete the group , just use dataset
 	groups.add({
@@ -89,35 +75,28 @@ export default function run() {
 		},
 	});
 
-
 	startVideo();
 
-	var loop_counter = 0;
-
-	function loop() {
-		if (loop_counter < 22) {
-			loop_counter++;
-			preprocess();
-			setTimeout(loop, delay);
-		}
-
+	async function loop() {
+		// update Frame
+		orig_v = tf.browser.fromPixels(video);
+		await preprocess();
+		//loop();
+		setTimeout(loop, delay);
 	}
 
 	// Video data Preprocess
-	function preprocess() {
+	async function preprocess() {
 
-		// Get the data of original video file
-		orig_v = tf.browser.fromPixels(video);
-
-		// Resize to [1, 36, 36, 3], type float 
 		Xsub = tf.image.resizeBilinear(orig_v, [dim, dim]);
 		Xsub = Xsub.asType('float32').div(tf.scalar(255));
 		Xsub = Xsub.expandDims(0); // (1, 36, 36, 3)
 
 		if (prevFrame == null) {
+			//	t0 = performance.now();
 			prevFrame = Xsub;
 			/* eslint-disable no-console */
-			console.log("initialize");
+			console.log("new data initialize");
 
 		} else {
 			//--------------------------------------
@@ -138,19 +117,24 @@ export default function run() {
 			} else {
 				Batch = tf.concat([Batch, Xsub]) // note the xsub here is after 
 				/* eslint-disable no-console */
-				console.log("below processed Batch and diffBatch");
+				//	console.log("below processed Batch and diffBatch");
 				diffBatch = tf.concat([diffBatch, dXsub]);
-				Batch.print(true);
-				diffBatch.print(true);
+				//	Batch.print(true);
+				//	diffBatch.print(true);
 			}
 			batch_counter++;
 		}
 
 		if (batch_counter == batch_size) {
-
-			(async () => {
-				await processModel();
-			})()
+			t_start = performance.now();
+			prediction = await model.predict([diffBatch, Batch]);
+			prediction_rppg = prediction[0].cumsum().arraySync();
+			prediction_resp = prediction[1].cumsum().arraySync();
+			console.log(prediciton_rppg)
+			console.log(prediction_resp)
+			t_end = performance.now();
+			console.log("total time spend for one Batch " + (t_end - t_start));
+			//	console.log()
 			addDataPoint();
 			// initialization for the next iteration
 			Batch = null;
@@ -194,11 +178,12 @@ export default function run() {
 			}])
 			i++;
 		}
-		setTimeout(moveWindow, delay);
+		moveWindow();
+		//setTimeout(moveWindow, delay);
 	}
 
 	function moveWindow() {
-
+		
 		let strategy = 'static';
 		var range = graph2d_rppg.getWindow();
 		now = vis.moment();

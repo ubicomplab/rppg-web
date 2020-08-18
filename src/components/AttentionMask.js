@@ -8,8 +8,8 @@ export class AttentionMask extends tf.layers.Layer {
 
 	computeOutputShape(inputShape) {
 		/* eslint-disable no-console */
-		console.log(inputShape)
-		console.log(this.name)
+	//	console.log(inputShape)
+	//	console.log(this.name)
 		this.inputShape = inputShape;
 		return [inputShape[0], inputShape[1], inputShape[2], inputShape[3]];
 	}
@@ -23,8 +23,8 @@ export class AttentionMask extends tf.layers.Layer {
 		//console.log(input);
 		
 		var inputSum = tf.sum(input, 1, 1);
-		inputSum.print(1);
-		inputSum.print(1);
+	//	inputSum.print(1);
+	//	inputSum.print(1);
 		inputSum = tf.sum(inputSum, 2, 1);
 		var out = input.div(inputSum).mul(0.5);
 		
