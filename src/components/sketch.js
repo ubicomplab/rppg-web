@@ -128,10 +128,11 @@ export default function run() {
 		if (batch_counter == batch_size) {
 			t_start = performance.now();
 			prediction = await model.predict([diffBatch, Batch]);
+			console.log(prediction[0].arraySync());
 			prediction_rppg = prediction[0].cumsum().arraySync();
 			prediction_resp = prediction[1].cumsum().arraySync();
-			console.log(prediciton_rppg)
-			console.log(prediction_resp)
+			console.log(prediction_rppg);
+		//	console.log(prediction_resp);
 			t_end = performance.now();
 			console.log("total time spend for one Batch " + (t_end - t_start));
 			//	console.log()
