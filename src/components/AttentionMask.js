@@ -18,9 +18,9 @@ export class AttentionMask extends tf.layers.Layer {
 	call(inputs, kwargs) {
 		/* eslint-disable no-console */
 		var input = inputs[0];
-		console.log(inputs[0].shape);
-		console.log(inputs[0].print(1));
-		console.log(input);
+		//console.log(inputs[0].shape);
+		//console.log(inputs[0].print(1));
+		//console.log(input);
 		
 		var inputSum = tf.sum(input, 1, 1);
 		inputSum.print(1);
