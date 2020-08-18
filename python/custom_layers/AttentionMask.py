@@ -1,3 +1,5 @@
+from tensorflow.python.keras import backend as K
+
 class Attention_mask(tf.keras.layers.Layer):
     def call(self, x):
         xsum = K.sum(x, axis=1, keepdims=True)

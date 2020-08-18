@@ -1,3 +1,6 @@
+import tensorflow as tf
+from tensorflow.python.keras import backend as K
+
 class TSM(tf.keras.layers.Layer):
     def call(self, x, n_frame, fold_div=3):
         nt, h, w, c = x.shape
