@@ -19,7 +19,7 @@ export class TSM extends tf.layers.Layer {
 		const n_frame = 20;
 		input.print(1);
 		/* eslint-disable no-console */
-		console.log(inputs);
+		//console.log(inputs);
 		
 		console.log("TSM is started execution");
 		/* eslint-disable no-console */
@@ -57,9 +57,6 @@ export class TSM extends tf.layers.Layer {
 
 		out = tf.concat([out1, out2, out3], -1);
 		out = tf.reshape(out, [-1, h, w, c]);
-
-		console.log("TSM is called, following is its output");
-		out.print(1);
 
 		return out;
 	}

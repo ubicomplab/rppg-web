@@ -2,12 +2,13 @@
 	<div>
 		<div id="WebCam">
 			<video autodisplay="true" height="480" width="640" id="video"></video>
-			<!--canvas id = "TargetRegion" height = "480" width = "640"></canvas-->
+			<!--canvas id = "mycanvas" height = "480" width = "640"></canvas-->
 			<!--canvas id = "canvasFrame" height = "680" width = "100%"></canvas-->
 			
 		</div>
 
-		<div id="visualization"></div>
+		<div id="chart_rppg"></div>
+		<div id="chart_resp"></div>
 	</div>
 </template>
 

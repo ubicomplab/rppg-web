@@ -13,13 +13,18 @@ export default function run() {
 	var path = "./model.json";
 	var orig_v, Xsub, dXsub, prevFrame;
 	var diffBatch, Batch;
-	var delay = 30;
+	var delay = 20;
 	var batch_size = 20;
 	var batch_counter = 0;
 	var dim = 36;
 	var prediction;
 	let model;
-	let prediction_rppg;
+	let prediction_rppg, prediction_resp;
+
+	// elements for draw the preprocess image
+	//var c = document.getElementById("myCanvas");
+	//var ctx = c.getContext('2d');
+
 
 	// Register Cusomized Layers
 	tf.serialization.registerClass(TSM);
@@ -35,22 +40,20 @@ export default function run() {
 
 	async function processModel() {
 		prediction = model.predict([diffBatch, Batch]);
-		prediction_rppg = prediction[0].arraySync();
-	//	var prediction_pulse = prediction[1].arraySync();
-		//rppg = Array.from(rppg);
-		//pulse = Array.from(pulse);
+		prediction_rppg = prediction[0].cumsum().arraySync();
+		prediction_resp = prediction[1].cumsum().arraySync();
 
-		//	prediction[0].print(1);
-		//	prediction[0].print(2);
-		console.log(prediction[0]);
-		console.log(prediction[1]);
+		console.log(prediction_rppg);
+		console.log(prediction_resp);
 	}
 
 	// Definition for the line chart 
 	var names = ["uniform"];
 	var groups = new vis.DataSet();
-	var container = document.getElementById("visualization");
-	var dataset = new vis.DataSet();
+	var container_rppg = document.getElementById("chart_rppg");
+	var container_resp = document.getElementById("chart_resp");
+	var dataset_rppg = new vis.DataSet();
+	var dataset_resp = new vis.DataSet();
 	var now = vis.moment();
 
 	var options = {
@@ -68,9 +71,11 @@ export default function run() {
 		end: vis.moment().add(10, "seconds"),
 
 	};
-
+	
 	// eslint-disable-next-line
-	var graph2d = new vis.Graph2d(container, dataset, groups, options);
+	var graph2d_rppg = new vis.Graph2d(container_rppg, dataset_rppg, groups, options);
+	var graph2d_resp = new vis.Graph2d(container_resp, dataset_resp, groups, options);
+	
 
 	// Note: could delete the group , just use dataset
 	groups.add({
@@ -97,7 +102,6 @@ export default function run() {
 		}
 
 	}
-
 
 	// Video data Preprocess
 	function preprocess() {
@@ -126,8 +130,6 @@ export default function run() {
 			dXsub = tf.div(dXsub, tf.moments(dXsub).variance.sqrt()); // dxsub / np.std(dxsub,ddof=1)
 			Xsub = tf.sub(Xsub, tf.mean(Xsub)); // Xsub = Xsub - Xsub.mean(axis = 0)
 			Xsub = tf.div(Xsub, tf.moments(Xsub).variance.sqrt()); // Xsub = Xsub - Xsub.mean(axis = 0)
-			/* eslint-disable no-console */
-			console.log("below is X before mean");
 
 			prevFrame = Xsub;
 			if (batch_counter == 0) {
@@ -135,6 +137,8 @@ export default function run() {
 				diffBatch = dXsub;
 			} else {
 				Batch = tf.concat([Batch, Xsub]) // note the xsub here is after 
+				/* eslint-disable no-console */
+				console.log("below processed Batch and diffBatch");
 				diffBatch = tf.concat([diffBatch, dXsub]);
 				Batch.print(true);
 				diffBatch.print(true);
@@ -143,7 +147,6 @@ export default function run() {
 		}
 
 		if (batch_counter == batch_size) {
-
 
 			(async () => {
 				await processModel();
@@ -175,17 +178,21 @@ export default function run() {
 	}
 
 	// the chart
-	function addDataPoint() {	
-		console.log(prediction);
+	function addDataPoint() {
 		var i = 0;
-		console.log(prediction_rppg[i])
 		while (i < 20) {
-			dataset.add([{
-				x: vis.moment(),
+			now = vis.moment()
+			dataset_rppg.add([{
+				x: now,
 				y: prediction_rppg[i],
 				group: 0
 			}])
-			i ++;
+			dataset_resp.add([{
+				x: now,
+				y: prediction_resp[i],
+				group: 0
+			}])
+			i++;
 		}
 		setTimeout(moveWindow, delay);
 	}
@@ -193,21 +200,22 @@ export default function run() {
 	function moveWindow() {
 
 		let strategy = 'static';
-		var range = graph2d.getWindow();
+		var range = graph2d_rppg.getWindow();
 		now = vis.moment();
 
 		var interval = range.end - range.start;
 
 		if (now > range.end) {
-			graph2d.setWindow(now - 0.1 * interval, now + 0.9 * interval);
+			graph2d_rppg.setWindow(now - 0.1 * interval, now + 0.9 * interval);
+			graph2d_resp.setWindow(now - 0.1 * interval, now + 0.9 * interval);
 		}
 
 		switch (strategy) {
 			default: // 'static'
 				// move the window 90% to the left when now is larger than the end of the window
 				if (range > 10) {
-					//		console.log("move window");
-					graph2d.setWindow(now - 0.1 * interval, now + 0.9 * interval);
+					graph2d_rppg.setWindow(now - 0.1 * interval, now + 0.9 * interval);
+					graph2d_resp.setWindow(now - 0.1 * interval, now + 0.9 * interval);
 				}
 				setTimeout(moveWindow, delay);
 				break;
