@@ -8,10 +8,10 @@ import {
 } from './TSM.js';
 
 export default function run() {
-
 	let video = document.getElementById('video');
 	var path = "./model.json";
-	var orig_v, Xsub, dXsub, prevFrame;
+	var orig_v, prevFrame;
+	//Xsub, dXsub, prevFrame;
 	var diffBatch, Batch;
 	var delay = 10;
 	var batch_size = 20;
@@ -21,6 +21,8 @@ export default function run() {
 	let model;
 	let prediction_rppg, prediction_resp;
 	var t_start, t_end;
+	var orig_batch;
+
 	// Register Cusomized Layers
 	tf.serialization.registerClass(TSM);
 	tf.serialization.registerClass(AttentionMask);
@@ -42,13 +44,29 @@ export default function run() {
 	var dataset_resp = new vis.DataSet();
 	var now = vis.moment();
 
-	var options = {
+	var options_rppg = {
 		drawPoints: false,
 		dataAxis: {
 			visible: true,
 			left: {
 				title: {
-					text: "Normalized Amplitude",
+					text: "cumsum  rppg",
+				}
+			}
+		},
+		legend: false,
+		start: vis.moment().add(-5, "seconds"), // display start,  end
+		end: vis.moment().add(10, "seconds"),
+
+	};
+
+	var options_resp = {
+		drawPoints: false,
+		dataAxis: {
+			visible: true,
+			left: {
+				title: {
+					text: "cumsum  resp",
 				}
 			}
 		},
@@ -59,9 +77,8 @@ export default function run() {
 	};
 
 	// eslint-disable-next-line
-	var graph2d_rppg = new vis.Graph2d(container_rppg, dataset_rppg, groups, options);
-	var graph2d_resp = new vis.Graph2d(container_resp, dataset_resp, groups, options);
-
+	var graph2d_rppg = new vis.Graph2d(container_rppg, dataset_rppg, groups, options_rppg);
+	var graph2d_resp = new vis.Graph2d(container_resp, dataset_resp, groups, options_resp);
 
 	// Note: could delete the group , just use dataset
 	groups.add({
@@ -88,39 +105,34 @@ export default function run() {
 	// Video data Preprocess
 	async function preprocess() {
 
-		Xsub = tf.image.resizeBilinear(orig_v, [dim, dim]);
+		var Xsub = tf.image.resizeBilinear(orig_v, [dim, dim]);
 		Xsub = Xsub.asType('float32').div(tf.scalar(255));
 		Xsub = Xsub.expandDims(0); // (1, 36, 36, 3)
 
 		if (prevFrame == null) {
-			//	t0 = performance.now();
 			prevFrame = Xsub;
+			orig_batch = orig_v;
 			/* eslint-disable no-console */
 			console.log("new data initialize");
 
 		} else {
 			//--------------------------------------
-			// didn't get  only the 300, 300 , ie didn't crop		
 
 			// FRAME DIFF:
-			dXsub = tf.div(tf.sub(Xsub, prevFrame), tf.add(Xsub, prevFrame));
-
+			var dXsub = tf.div(tf.sub(Xsub, prevFrame), tf.add(Xsub, prevFrame));
+			var Xsub2 = tf.sub(Xsub, tf.mean(Xsub)); // Xsub = Xsub - Xsub.mean(axis = 0)
 			// SUBTRACT MEAN OF IMG:
 			dXsub = tf.div(dXsub, tf.moments(dXsub).variance.sqrt()); // dxsub / np.std(dxsub,ddof=1)
-			Xsub = tf.sub(Xsub, tf.mean(Xsub)); // Xsub = Xsub - Xsub.mean(axis = 0)
-			Xsub = tf.div(Xsub, tf.moments(Xsub).variance.sqrt()); // Xsub = Xsub - Xsub.mean(axis = 0)
+			Xsub2 = tf.div(Xsub, tf.moments(Xsub2).variance.sqrt()); // Xsub = Xsub - Xsub.mean(axis = 0)
 
 			prevFrame = Xsub;
 			if (batch_counter == 0) {
-				Batch = tf.cast(Xsub, 'float32');
+				Batch = tf.cast(Xsub2, 'float32');
 				diffBatch = dXsub;
 			} else {
-				Batch = tf.concat([Batch, Xsub]) // note the xsub here is after 
-				/* eslint-disable no-console */
-				//	console.log("below processed Batch and diffBatch");
+				Batch = tf.concat([Batch, Xsub2]) // note the xsub here is after 
 				diffBatch = tf.concat([diffBatch, dXsub]);
-				//	Batch.print(true);
-				//	diffBatch.print(true);
+				orig_batch = tf.concat([orig_v, orig_batch]);
 			}
 			batch_counter++;
 		}
@@ -131,20 +143,23 @@ export default function run() {
 			console.log(prediction[0].arraySync());
 			prediction_rppg = prediction[0].cumsum().arraySync();
 			prediction_resp = prediction[1].cumsum().arraySync();
+			
 			console.log(prediction_rppg);
-		//	console.log(prediction_resp);
 			t_end = performance.now();
+			
 			console.log("total time spend for one Batch " + (t_end - t_start));
-			//	console.log()
 			addDataPoint();
+			
 			// initialization for the next iteration
 			Batch = null;
 			diffBatch = null;
+			orig_batch = null;
 			prevFrame = null;
 			batch_counter = 0;
 
 		}
 	}
+
 
 	function startVideo() {
 		if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
@@ -184,7 +199,7 @@ export default function run() {
 	}
 
 	function moveWindow() {
-		
+
 		let strategy = 'static';
 		var range = graph2d_rppg.getWindow();
 		now = vis.moment();
