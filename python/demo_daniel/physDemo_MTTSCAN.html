@@ -1,0 +1,346 @@
+<!doctype html>
+<html>
+
+	<head>
+		<title>Line Chart</title>
+		<script src="https://www.chartjs.org/dist/2.9.3/Chart.min.js"></script>
+		<script src="https://www.chartjs.org/samples/latest/utils.js"></script>
+		<style>
+			canvasGraph{
+		-moz-user-select: none;
+		-webkit-user-select: none;
+		-ms-user-select: none;
+	}
+	</style>
+	</head>
+
+	<body>
+		<div style="height: 200px">
+			<div>CardioBrowser Demo</div>
+			<canvas id="canvasGraph"></canvas>
+		</div>
+		<br>
+		<br>
+
+		<button type="button" onclick="init()">Start</button>
+		<div><canvas id="canvas"></canvas></div>
+		<div id="label-container"></div>
+		<script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@1.3.1/dist/tf.min.js"></script>
+		<script src="https://cdn.jsdelivr.net/npm/@teachablemachine/pose@0.8/dist/teachablemachine-pose.min.js"></script>
+		<!--<script src="https://cdn.jsdelivr.net/npm/@teachablemachine/image@0.8/dist/teachablemachine-image.min.js"></script>-->
+		<script type="text/javascript">
+			
+			
+			class TSM extends tf.layers.Layer {
+
+				constructor(config) {
+					super(config);
+				}
+
+				computeOutputShape(inputShape) {
+					/* eslint-disable no-console */
+					//console.log(inputShape);
+					return inputShape;
+				}
+
+				// eslint-disable-next-line
+				call(inputs) {
+
+					var input = inputs[0];
+					const n_frame = 20;
+					//input.print(1);
+					/* eslint-disable no-console */
+					//console.log(inputs);
+
+					//console.log("TSM is started execution");
+					/* eslint-disable no-console */
+					//console.log(input.shape);
+					let nt, h, w, c;
+					// eslint-disable-next-line
+					let out, out1, out2, out3, empty;
+					let padding1, padding2;
+					nt = input.shape[0];
+					h = input.shape[1];
+					w = input.shape[2];
+					c = input.shape[3];
+
+					const fold_div = 3;
+					const fold = Math.floor(c / fold_div);
+					const last_fold = c - (fold_div - 1) * fold;
+					//console.log(fold)
+					input = tf.reshape(input, [nt, h, w, c]);
+					input = tf.expandDims(input, 0);
+					[out1, out2, out3] = tf.split(input, [fold, fold, last_fold], -1)
+
+					// Shift left
+					padding1 = tf.zeros([out1.shape[0], 1, out1.shape[2], out1.shape[3], fold]);
+
+					//console.log(padding1);
+					[empty, out1] = tf.split(out1, [1, n_frame - 1], 1);
+					//console.log(out1);
+					//console.log(empty);
+					out1 = tf.concat([out1, padding1], 1);
+					//console.log(out1);
+
+					// Shift right
+					padding2 = tf.zeros([out2.shape[0], 1, out2.shape[2], out2.shape[3], fold]);
+					[out2, empty] = tf.split(out2, [n_frame - 1, 1], 1);
+					out2 = tf.concat([padding2, out2], 1);
+
+					out = tf.concat([out1, out2, out3], -1);
+					out = tf.reshape(out, [-1, h, w, c]);
+
+					return out;
+				}
+
+				getConfig() {
+					const config = super.getConfig();
+					return config;
+				}
+
+				static getClassName() {
+					return 'TSM';
+				}
+
+			}
+
+			TSM.className = 'TSM'; // static variable
+
+
+			class AttentionMask extends tf.layers.Layer {
+				static className = 'AttentionMask';
+				constructor(config) {
+					super(config);
+				}
+
+				computeOutputShape(inputShape) {
+					this.inputShape = inputShape;
+					return [inputShape[0], inputShape[1], inputShape[2], inputShape[3]];
+				}
+
+				// eslint-disable-next-line
+				call(inputs, kwargs) {
+					/* eslint-disable no-console */
+					var input = inputs[0];
+					var inputSum = tf.sum(input, 1, 1);
+					inputSum = tf.sum(inputSum, 2, 1);
+					var out = input.div(inputSum).mul(0.5);
+
+					return out;
+				}
+
+				getConfig() {
+					const config = super.getConfig();
+					return config;
+				}
+
+				static getClassName() {
+					return 'AttentionMask';
+				}
+			}
+
+			AttentionMask.className = 'AttentionMask'; // static variable
+
+			tf.serialization.registerClass(TSM);
+			tf.serialization.registerClass(AttentionMask);
+
+			var startTime;
+			var movingAvg;
+
+			var config = {
+				type: 'line',
+				data: {
+					labels: [],
+					datasets: [{
+						label: 'Pulse',
+						backgroundColor: window.chartColors.red,
+						borderColor: window.chartColors.red,
+						data: [],
+						fill: false,
+					}]
+				},
+				options: {
+					responsive: true,
+					// title: {
+					// 	display: true,
+					// 	text: 'Chart.js Line Chart'
+					// },
+					maintainAspectRatio: false,
+					tooltips: {
+						mode: 'index',
+						intersect: false,
+					},
+					elements: {
+						point: {
+							radius: 0
+						}
+					},
+					// hover: {
+					// 	mode: 'nearest',
+					// 	intersect: true
+					// },
+					scales: {
+						xAxes: [{
+							display: true,
+							ticks: {
+								stepSize: 0.1
+							},
+							scaleLabel: {
+								display: true,
+								labelString: 'Time'
+							}
+						}],
+						yAxes: [{
+							display: true,
+							scaleLabel: {
+								display: true,
+								labelString: 'Norm. Amp.'
+							}
+						}]
+					}
+				}
+			};
+
+			window.onload = function() {
+				var ctx = document.getElementById('canvasGraph').getContext('2d');
+				window.myLine = new Chart(ctx, config);
+			};
+
+			var colorNames = Object.keys(window.chartColors);
+
+
+
+			// More API functions here:
+			// https://github.com/googlecreativelab/teachablemachine-community/tree/master/libraries/pose
+
+			// the link to your model provided by Teachable Machine export panel
+			const URL = "./public/"; //"./TSM/"
+			let model, webcam, ctx, labelContainer, prevFrame, cumSum;
+			let counter, Batch, diffBatch;
+
+			async function init() {
+				const modelURL = URL + "model.json";
+				//            const metadataURL = URL + "metadata.json";
+
+				startTime = new Date();
+				movingAvg = [];
+
+				// load the model and metadata
+				// Refer to tmImage.loadFromFiles() in the API to support files from a file picker
+				// Note: the pose library adds a tmPose object to your window (window.tmPose)
+				// model = await tmPose.load(modelURL, metadataURL);
+				model = await tf.loadLayersModel(modelURL);
+				console.log("model loaded successfully")
+
+				// Convenience function to setup a webcam
+				const size = 300;
+				const flip = true; // whether to flip the webcam
+				webcam = new tmPose.Webcam(size, size, flip); // width, height, flip
+				await webcam.setup(); // request access to the webcam
+				await webcam.play();
+				window.requestAnimationFrame(loop);
+
+				// append/get elements to the DOM
+				const canvas = document.getElementById("canvas");
+				canvas.width = size;
+				canvas.height = size;
+				ctx = canvas.getContext("2d");
+				labelContainer = document.getElementById("label-container");
+			}
+
+			async function loop(timestamp) {
+				webcam.update(); // update the webcam frame
+				await predict();
+				window.requestAnimationFrame(loop);
+			}
+
+			async function predict() {
+				// Prediction:
+				var img = tf.browser.fromPixels(webcam.canvas);
+				img = tf.image.resizeBilinear(img, [36, 36])
+
+				//img = img.toFloat().div(tf.scalar(127)).sub(tf.scalar(1));
+				// DIVIDE BY 255:
+				img = img.toFloat().div(tf.scalar(255));
+				//img = tf.clip_by_value(t, clip_value_min=clip_min
+
+				if (prevFrame == null) {
+					prevFrame = img;
+					cumSum = 0;
+				} else {
+					// FRAME DIFF:
+
+					var diff = tf.div(tf.sub(img, prevFrame), tf.add(img, prevFrame))
+					// SUBTRACT MEAN OF IMG:
+					var img2 = tf.sub(img, tf.mean(img))
+					img2 = tf.div(img2, tf.moments(img2).variance.sqrt())
+					diff = tf.div(diff, tf.moments(diff).variance.sqrt())
+
+					//diff = tf.div(diff,tf.variance(diff))
+					//img = tf.div(img,tf.variance(img))
+
+					counter++;
+
+					if (counter == 0) {
+						Batch = img2;
+						diffBatch = diff;
+					} else {
+						Batch = tf.concat([Batch, Xsub2]) // note the xsub here is after
+						diffBatch = tf.concat([diffBatch, dXsub]);
+					}
+
+					if (counter == 20) {
+
+						var prediction = await model.predict([diffBatch, Batch]); //webcam.canvas
+						prediction = prediction[0].cumsum().arraySync();
+						console.log(prediction);
+
+
+						prevFrame = img;
+						//cumSum = cumSum + prediction[0];
+
+						// Moving Average:
+						var i = 0;
+						while (i < 20) {
+							movingAvg.push(predictio[i]);
+							if (movingAvg.length > 10) {
+								movingAvg.shift()
+							}
+						}
+
+						const average = arr => arr.reduce((sume, el) => sume + el, 0) / arr.length;
+
+						// Add latest values:
+						if (config.data.datasets.length > 0) {
+							var currentTime = new Date();
+							timeDiff = (currentTime - startTime) / 1000;
+							config.data.labels.push(timeDiff);
+
+							config.data.datasets.forEach(function(dataset) {
+								d = (cumSum - average(movingAvg))
+								dataset.data.push(d);
+							});
+
+							config.data.datasets.forEach(function(dataset) {
+								if (dataset.data.length > 300) {
+									dataset.data.shift();
+									config.data.labels.shift();
+								}
+							});
+
+							window.myLine.update();
+						}
+					}
+
+				}
+
+				drawFrame();
+			}
+
+			function drawFrame() {
+				if (webcam.canvas) {
+					ctx.drawImage(webcam.canvas, 0, 0);
+				}
+			}
+		</script>
+	</body>
