@@ -19,16 +19,14 @@ export class TSM extends tf.layers.Layer {
 		const n_frame = 20;
 		//input.print(1);
 		/* eslint-disable no-console */
-		//console.log(inputs);
-		
+		//console.log(inputs);	
 		//console.log("TSM is started execution");
-		/* eslint-disable no-console */
-		//console.log(input.shape);
+		
 		let nt, h, w, c;
 		// eslint-disable-next-line
 		let out, out1, out2, out3, empty;
 		let padding1, padding2;
-		nt = input.shape[0];
+		nt = input.shape[0]; // 20
 		h = input.shape[1];
 		w = input.shape[2];
 		c = input.shape[3];
@@ -37,17 +35,12 @@ export class TSM extends tf.layers.Layer {
 		const fold = Math.floor(c / fold_div);
 		const last_fold = c - (fold_div - 1) * fold;
 		//console.log(fold)
-		input = tf.reshape(input, [nt, h, w, c]);
-		input = tf.expandDims(input, 0);
+		input = tf.reshape(input, [-1, nt, h, w, c]);
 		[out1, out2, out3] = tf.split(input, [fold, fold, last_fold], -1)
 
 		// Shift left
-		padding1 = tf.zeros([out1.shape[0], 1, out1.shape[2], out1.shape[3], fold]);
-		
-		//console.log(padding1);
+		padding1 = tf.zeros([out1.shape[0], 1, out1.shape[2], out1.shape[3], fold]);	
 		[empty, out1] = tf.split(out1, [1, n_frame - 1], 1);
-		//console.log(out1);
-		//console.log(empty);
 		out1 = tf.concat([out1, padding1], 1);
 		//console.log(out1);
 
