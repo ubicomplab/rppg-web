@@ -19,9 +19,8 @@ export class AttentionMask extends tf.layers.Layer {
 		var inputSum = tf.sum(input, 1, true);
 
 		inputSum = tf.sum(inputSum, 2, true);
-		var out = input.div(inputSum).mul(inputSum.shape[1]).mul(inputSum.shape[2]).mul(0.5);
-		
-		
+		var out = input.div(inputSum).mul(input.shape[1]).mul(input.shape[2]).mul(0.5);
+			
 		return out;
 	}
 
