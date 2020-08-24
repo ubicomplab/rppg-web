@@ -8,6 +8,7 @@ import {
 } from './TSM.js';
 
 export default function run() {
+
 	let video = document.getElementById('video');
 	var path = "./model.json";
 	var orig_v, prevFrame;
@@ -29,10 +30,13 @@ export default function run() {
 
 	// Load ML Model
 	loadModel();
+
 	async function loadModel() {
+		
 		model = await tf.loadLayersModel(path);
 		/* eslint-disable no-console */
 		console.log("Successfully loaded ml model");
+		
 	}
 
 	// Definition for the line chart 
@@ -57,7 +61,6 @@ export default function run() {
 		legend: false,
 		start: vis.moment().add(-5, "seconds"), // display start,  end
 		end: vis.moment().add(10, "seconds"),
-
 	};
 
 	var options_resp = {
@@ -73,7 +76,6 @@ export default function run() {
 		legend: false,
 		start: vis.moment().add(-5, "seconds"), // display start,  end
 		end: vis.moment().add(10, "seconds"),
-
 	};
 
 	// eslint-disable-next-line
@@ -95,10 +97,9 @@ export default function run() {
 	startVideo();
 
 	async function loop() {
-		// update Frame
-		orig_v = tf.browser.fromPixels(video);
+		
+		orig_v = tf.browser.fromPixels(video); // update Frame
 		await preprocess();
-		//loop();
 		setTimeout(loop, delay);
 	}
 
@@ -110,46 +111,55 @@ export default function run() {
 		Xsub = Xsub.expandDims(0); // (1, 36, 36, 3)
 
 		if (prevFrame == null) {
+			
 			prevFrame = Xsub;
 			orig_batch = orig_v;
 			/* eslint-disable no-console */
 			console.log("new data initialize");
-
+			
 		} else {
-			//--------------------------------------
-
+			
 			// FRAME DIFF:
 			var dXsub = tf.div(tf.sub(Xsub, prevFrame), tf.add(Xsub, prevFrame));
 			var Xsub2 = tf.sub(Xsub, tf.mean(Xsub)); // Xsub = Xsub - Xsub.mean(axis = 0)
+			
 			// SUBTRACT MEAN OF IMG:
 			dXsub = tf.div(dXsub, tf.moments(dXsub).variance.sqrt()); // dxsub / np.std(dxsub,ddof=1)
 			Xsub2 = tf.div(Xsub, tf.moments(Xsub2).variance.sqrt()); // Xsub = Xsub - Xsub.mean(axis = 0)
 
 			prevFrame = Xsub;
+			
 			if (batch_counter == 0) {
+				
 				Batch = tf.cast(Xsub2, 'float32');
 				diffBatch = dXsub;
+				
 			} else {
+				
 				Batch = tf.concat([Batch, Xsub2]) // note the xsub here is after 
 				diffBatch = tf.concat([diffBatch, dXsub]);
 				orig_batch = tf.concat([orig_v, orig_batch]);
+			
 			}
 			batch_counter++;
+			
 		}
 
 		if (batch_counter == batch_size) {
 			t_start = performance.now();
 			prediction = await model.predict([diffBatch, Batch]);
 			console.log(prediction[0].arraySync());
-			prediction_rppg = prediction[0].cumsum().arraySync();
-			prediction_resp = prediction[1].cumsum().arraySync();
-			
+			console.log(prediction[1].arraySync());
+
+			prediction_rppg = normalize_data(prediction[0].cumsum().arraySync());
+			prediction_resp = normalize_data(prediction[1].cumsum().arraySync());
+
 			console.log(prediction_rppg);
 			t_end = performance.now();
-			
+
 			console.log("total time spend for one Batch " + (t_end - t_start));
-			addDataPoint();
-			
+			await addDataPoint();
+
 			// initialization for the next iteration
 			Batch = null;
 			diffBatch = null;
@@ -161,6 +171,7 @@ export default function run() {
 	}
 
 
+	// Video initialization 
 	function startVideo() {
 		if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
 			navigator.mediaDevices.getUserMedia({
@@ -177,25 +188,43 @@ export default function run() {
 		}
 	}
 
+	// normalize output function 
+	function normalize_data(array) {
+		//console.log(array);
+		var merged = [].concat.apply([], array);
+		const n = merged.length;
+		const max = Math.max.apply(Math, array);
+		const min = Math.min.apply(Math, array);
+		const diff = max - min;
+		var i = 0;
+		while (i < n) {
+
+			merged[i] = (merged[i] - min) / diff;
+			i++;
+		}
+		console.log(merged)
+		return merged;
+
+	}
+
 	// the chart
 	function addDataPoint() {
 		var i = 0;
 		while (i < 20) {
-			now = vis.moment()
+			now = vis.moment();
 			dataset_rppg.add([{
 				x: now,
 				y: prediction_rppg[i],
 				group: 0
-			}])
+			}]);
 			dataset_resp.add([{
 				x: now,
 				y: prediction_resp[i],
 				group: 0
-			}])
+			}]);
 			i++;
 		}
-		moveWindow();
-		//setTimeout(moveWindow, delay);
+		setTimeout(moveWindow, delay);
 	}
 
 	function moveWindow() {
