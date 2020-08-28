@@ -7,8 +7,6 @@ import {
 	TSM
 } from './TSM.js';
 
-
-
 export default function run() {
 
 	let video = document.getElementById('video');
@@ -25,7 +23,6 @@ export default function run() {
 	var prediction;
 	let model;
 	let prediction_rppg, prediction_resp;
-	//const Delay = ms => new Promise(res => setTimeout(res, ms));
 
 	// Register Cusomized Layers
 	tf.serialization.registerClass(TSM);
@@ -79,23 +76,19 @@ export default function run() {
 	var graph2d_resp = new vis.Graph2d(container_resp, dataset_resp, options_resp);
 
 
-	//	var counter = 0;
-	async function loadModel() {
-
+	async function loadModel() {	
 		model = await tf.loadLayersModel(path);
 		/* eslint-disable no-console */
-		console.log("Successfully loaded ml model");
+		console.log("Successfully loaded ml model");	
 	}
 
 	var current_tolerance = 2 * batch_size;
 	async function loop() {
 		orig_v = tf.browser.fromPixels(video); // update Frame
-		var t1 = performance.now();
 		preprocess();
+		
+		// Start ploting once 40 prediction results stored
 		if (movingAvg_resp.length >= current_tolerance) {
-			var t2 = performance.now();
-			console.log("one process")
-			console.log(t2 - t1);
 
 			addDataPoint(movingAvg_rppg[0], movingAvg_resp[0]);
 			movingAvg_resp.shift();
@@ -109,21 +102,20 @@ export default function run() {
 		setTimeout(loop, 10);
 	}
 
-	// Video data Preprocess
-	async function preprocess() {
-		var at2 = performance.now();
-
+	// Preprocess a frame of video, and once Batch and diffBatch hit 20, 
+	//   do prediction
+	async function preprocess() { 
+		
 		var Xsub = tf.image.resizeBilinear(orig_v, [dim, dim]);
-
 		Xsub = Xsub.asType('float32').div(tf.scalar(255));
 		Xsub = Xsub.expandDims(0); // (1, 36, 36, 3)
 
 		if (prevFrame == null) {
-
+			
 			prevFrame = Xsub;
-
+			
 		} else {
-
+			
 			// FRAME DIFF:
 			var dXsub = tf.div(tf.sub(Xsub, prevFrame), tf.add(Xsub, prevFrame));
 			var Xsub2 = tf.sub(Xsub, tf.mean(Xsub)); // Xsub = Xsub - Xsub.mean(axis = 0)
@@ -138,51 +130,51 @@ export default function run() {
 				Batch = tf.cast(Xsub2, 'float32');
 				diffBatch = dXsub;
 			} else {
-				Batch = tf.concat([Batch, Xsub2]) // note the xsub here is after 
+				Batch = tf.concat([Batch, Xsub2]);
 				diffBatch = tf.concat([diffBatch, dXsub]);
 			}
+			
 			batch_counter++;
-			var at3 = performance.now();
-			console.log("preprocess " + (at3 - at2));
 		}
 		
 		if (batch_counter == batch_size) {
 
-			var t4 = performance.now();
+			// Prediction
 			prediction = await model.predict([diffBatch, Batch]);
+			
+			// Post Process
 			prediction_rppg = prediction[0].cumsum().arraySync(); // size 20
 			prediction_resp = prediction[1].cumsum().arraySync(); // size 20		
-
+	
 			prediction_rppg = postProcess(prediction_rppg);
 			prediction_resp = postProcess(prediction_resp);
 
-			console.log(prediction_resp)
-			//	await addDataPoint();
-
+			// Update the array used to store result 
 			movingAvg_resp = movingAvg_resp.concat(prediction_resp);
-			console.log(movingAvg_resp);
 			movingAvg_rppg = movingAvg_rppg.concat(prediction_rppg);
-
 
 			// initialization for the next iteration
 			Batch = null;
 			diffBatch = null;
 			batch_counter = 0;
-			var t5 = performance.now();
-			console.log("post process" + (t5 - t4));
+			
 		}
 	}
 
+	// postProcess(array): takes an array and updates 
+	// 		array[i] = array[i] - movingAvg(array[0], array[i])
+	// Note: cumsum_end stores the cumsum value of the last Batch
 	function postProcess(array) {
 		var i = 1;
 		const len = array.length;
-		array[0] = parseFloat(array[0] - cumsum_end);
+		array[0] = array[0] - cumsum_end;
 		while (i <= len) {
 			var partArray = array.slice(0, i).map(Number);
 			const avg = partArray.reduce((a, b) => a + b) / partArray.length;
 			array[i] -= avg;
 			i += 1;
 		}
+		
 		array.pop();
 		cumsum_end = array[len - 1];
 		return array;
@@ -258,22 +250,3 @@ export default function run() {
 		}
 	}
 }
-/*		movingAvg_rppg.push(cumsum_rppg);
-			movingAvg_resp.push(cumsum_resp);
-
-			if (movingAvg_rppg.length > 10) {
-				movingAvg_rppg.shift();
-				movingAvg_resp.shift();
-			}
-
-			const avg_rppg = movingAvg_rppg.reduce((a, b) => a + b) / movingAvg_rppg.length;
-			const avg_resp = movingAvg_resp.reduce((a, b) => a + b) / movingAvg_resp.length;
-
-			const data_rppg = cumsum_rppg - avg_rppg;
-			const data_resp = cumsum_resp - avg_resp;
-
-			mvAvg_len++;
-			if (mvAvg_len > 10) {
-				addDataPoint(data_rppg, data_resp);
-				moveWindow();
-			}*/
