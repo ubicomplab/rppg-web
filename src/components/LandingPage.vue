@@ -1,12 +1,13 @@
 <template>
 	<div>
 		<div id="WebCam">
-			<video autodisplay="true" height="480" width="640" id="video"></video>
+			<video autodisplay="true" height="400" width="400" id="video"></video>
 		</div>
-
+	
+		
 		<div id="chart_rppg"></div>
 		<div id="chart_resp"></div>
-		
+
 	</div>
 </template>
 
@@ -18,21 +19,16 @@
 		props: {
 			msg: String
 		},
-		mounted() {		
+		mounted() {
 			run();
 		},
 		methods: {
-			
+
 		}
 	}
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-	#chart {
 
-		top: 900;
-		left: 900;
-
-	}
 </style>
