@@ -14,7 +14,8 @@ export default function run() {
 	var orig_v, prevFrame;
 	var movingAvg_rppg = [];
 	var movingAvg_resp = [];
-	let cumsum_end = 0;
+	var buffer_rppg = [];
+	var buffer_resp = [];
 	var diffBatch, Batch;
 	var delay = 10;
 	const batch_size = 20;
@@ -23,6 +24,7 @@ export default function run() {
 	var prediction;
 	let model;
 	let prediction_rppg, prediction_resp;
+	var buffer_size = 2 * batch_size;
 
 	// Register Cusomized Layers
 	tf.serialization.registerClass(TSM);
@@ -33,8 +35,6 @@ export default function run() {
 	startVideo();
 
 	// Definition for the line chart 
-	//var names = ["uniform"];
-	//var groups = new vis.DataSet();
 	var container_rppg = document.getElementById("chart_rppg");
 	var container_resp = document.getElementById("chart_resp");
 	var dataset_rppg = new vis.DataSet();
@@ -76,27 +76,26 @@ export default function run() {
 	var graph2d_resp = new vis.Graph2d(container_resp, dataset_resp, options_resp);
 
 
-	async function loadModel() {	
+	async function loadModel() {
 		model = await tf.loadLayersModel(path);
 		/* eslint-disable no-console */
-		console.log("Successfully loaded ml model");	
+		console.log("Successfully loaded ml model");
 	}
 
-	var current_tolerance = 2 * batch_size;
 	async function loop() {
 		orig_v = tf.browser.fromPixels(video); // update Frame
 		preprocess();
-		
-		// Start ploting once 40 prediction results stored
-		if (movingAvg_resp.length >= current_tolerance) {
 
+		// Start ploting once 40 prediction results stored
+		if (movingAvg_resp.length >= buffer_size) {
+			
 			addDataPoint(movingAvg_rppg[0], movingAvg_resp[0]);
 			movingAvg_resp.shift();
 			movingAvg_rppg.shift();
-			current_tolerance--;
+			buffer_size--;
 
-			if (current_tolerance < 0) {
-				current_tolerance = movingAvg_resp.length;
+			if (buffer_size <= 0) {
+				buffer_size = movingAvg_resp.length;
 			}
 		}
 		setTimeout(loop, 10);
@@ -104,18 +103,16 @@ export default function run() {
 
 	// Preprocess a frame of video, and once Batch and diffBatch hit 20, 
 	//   do prediction
-	async function preprocess() { 
-		
+	async function preprocess() {
+
 		var Xsub = tf.image.resizeBilinear(orig_v, [dim, dim]);
 		Xsub = Xsub.asType('float32').div(tf.scalar(255));
 		Xsub = Xsub.expandDims(0); // (1, 36, 36, 3)
 
 		if (prevFrame == null) {
-			
 			prevFrame = Xsub;
-			
 		} else {
-			
+
 			// FRAME DIFF:
 			var dXsub = tf.div(tf.sub(Xsub, prevFrame), tf.add(Xsub, prevFrame));
 			var Xsub2 = tf.sub(Xsub, tf.mean(Xsub)); // Xsub = Xsub - Xsub.mean(axis = 0)
@@ -136,18 +133,18 @@ export default function run() {
 			
 			batch_counter++;
 		}
-		
+
 		if (batch_counter == batch_size) {
 
 			// Prediction
 			prediction = await model.predict([diffBatch, Batch]);
-			
+
 			// Post Process
 			prediction_rppg = prediction[0].cumsum().arraySync(); // size 20
 			prediction_resp = prediction[1].cumsum().arraySync(); // size 20		
-	
-			prediction_rppg = postProcess(prediction_rppg);
-			prediction_resp = postProcess(prediction_resp);
+			
+			prediction_rppg = postProcess(prediction_rppg, buffer_rppg);
+			prediction_resp = postProcess(prediction_resp, buffer_resp);
 
 			// Update the array used to store result 
 			movingAvg_resp = movingAvg_resp.concat(prediction_resp);
@@ -157,26 +154,26 @@ export default function run() {
 			Batch = null;
 			diffBatch = null;
 			batch_counter = 0;
-			
+
 		}
 	}
 
 	// postProcess(array): takes an array and updates 
-	// 		array[i] = array[i] - movingAvg(array[0], array[i])
-	// Note: cumsum_end stores the cumsum value of the last Batch
-	function postProcess(array) {
-		var i = 1;
+	// 		array[i] = array[i] - avg(Buffer) 
+	// Buffer: always stores 20 cumsum values, update as new point added
+	function postProcess(array, buffer) {
+		var i = 0;
 		const len = array.length;
-		array[0] = array[0] - cumsum_end;
-		while (i <= len) {
-			var partArray = array.slice(0, i).map(Number);
-			const avg = partArray.reduce((a, b) => a + b) / partArray.length;
+		array = [].concat.apply([], array);
+		while (i < len) {	
+			buffer.push(array[i]);
+			if (buffer.length > batch_size){
+				buffer.shift();
+			}
+			const avg = buffer.reduce((a, b) => a + b) / buffer.length;
 			array[i] -= avg;
 			i += 1;
 		}
-		
-		array.pop();
-		cumsum_end = array[len - 1];
 		return array;
 	}
 
@@ -197,22 +194,19 @@ export default function run() {
 		}
 	}
 
-	async function addDataPoint(data_rppg, data_resp) {
-
+	function addDataPoint(data_rppg, data_resp) {
 		now = vis.moment();
 
 		dataset_rppg.add([{
 			x: now,
 			y: data_rppg,
 		}]);
-
 		dataset_resp.add([{
 			x: now,
 			y: data_resp,
 		}]);
 
 		moveWindow();
-
 	}
 
 	function moveWindow() {
@@ -220,7 +214,6 @@ export default function run() {
 		let strategy = 'static';
 		var range_rppg = graph2d_rppg.getWindow();
 		var range_resp = graph2d_resp.getWindow();
-		//	const time_now = vis.moment();
 
 		var interval_rppg = range_rppg.end - range_rppg.start;
 		var interval_resp = range_resp.end - range_resp.start;
