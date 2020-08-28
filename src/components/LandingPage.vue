@@ -3,11 +3,8 @@
 		<div id="WebCam">
 			<video autodisplay="true" height="400" width="400" id="video"></video>
 		</div>
-	
-		
 		<div id="chart_rppg"></div>
 		<div id="chart_resp"></div>
-
 	</div>
 </template>
 
@@ -22,10 +19,9 @@
 		mounted() {
 			run();
 		},
-		methods: {
-
-		}
+		methods: {}
 	}
+	
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
