@@ -66,7 +66,7 @@ export default function run() {
 				}
 			}
 		},
-		legend: true,
+		legend: false,
 		start: vis.moment().add(-1, "seconds"), // display start,  end
 		end: vis.moment().add(10, "seconds"),
 	};
