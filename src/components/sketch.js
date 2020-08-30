@@ -51,9 +51,12 @@ export default function run() {
 				}
 			}
 		},
-		legend: false,
+		rollingMode:{
+			follow: true,
+			offset: 0.75
+		},
 		start: vis.moment().add(-1, "seconds"), // display start,  end
-		end: vis.moment().add(10, "seconds"),
+		end: vis.moment().add(30, "seconds"),
 	};
 
 	var options_resp = {
@@ -66,9 +69,12 @@ export default function run() {
 				}
 			}
 		},
-		legend: false,
+		rollingMode:{
+			follow: true,
+			offset: 0.75
+		},
 		start: vis.moment().add(-1, "seconds"), // display start,  end
-		end: vis.moment().add(10, "seconds"),
+		end: vis.moment().add(30, "seconds"),
 	};
 
 	// eslint-disable-next-line
