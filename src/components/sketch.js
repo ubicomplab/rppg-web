@@ -8,7 +8,6 @@ import {
 } from './TSM.js';
 
 export default function run() {
-
 	let video = document.getElementById('video');
 	var path = "./model.json";
 	var orig_v, prevFrame;
@@ -51,7 +50,7 @@ export default function run() {
 				}
 			}
 		},
-		rollingMode:{
+		rollingMode: {
 			follow: true,
 			offset: 0.75
 		},
@@ -69,7 +68,7 @@ export default function run() {
 				}
 			}
 		},
-		rollingMode:{
+		rollingMode: {
 			follow: true,
 			offset: 0.75
 		},
@@ -80,7 +79,6 @@ export default function run() {
 	// eslint-disable-next-line
 	var graph2d_rppg = new vis.Graph2d(container_rppg, dataset_rppg, options_rppg);
 	var graph2d_resp = new vis.Graph2d(container_resp, dataset_resp, options_resp);
-
 
 	async function loadModel() {
 		model = await tf.loadLayersModel(path);
@@ -94,7 +92,7 @@ export default function run() {
 
 		// Start ploting once 40 prediction results stored
 		if (movingAvg_resp.length >= buffer_size) {
-			
+
 			addDataPoint(movingAvg_rppg[0], movingAvg_resp[0]);
 			movingAvg_resp.shift();
 			movingAvg_rppg.shift();
@@ -136,7 +134,7 @@ export default function run() {
 				Batch = tf.concat([Batch, Xsub2]);
 				diffBatch = tf.concat([diffBatch, dXsub]);
 			}
-			
+
 			batch_counter++;
 		}
 
@@ -148,7 +146,7 @@ export default function run() {
 			// Post Process
 			prediction_rppg = prediction[0].cumsum().arraySync(); // size 20
 			prediction_resp = prediction[1].cumsum().arraySync(); // size 20		
-			
+
 			prediction_rppg = postProcess(prediction_rppg, buffer_rppg);
 			prediction_resp = postProcess(prediction_resp, buffer_resp);
 
@@ -171,9 +169,9 @@ export default function run() {
 		var i = 0;
 		const len = array.length;
 		array = [].concat.apply([], array);
-		while (i < len) {	
+		while (i < len) {
 			buffer.push(array[i]);
-			if (buffer.length > batch_size){
+			if (buffer.length > batch_size) {
 				buffer.shift();
 			}
 			const avg = buffer.reduce((a, b) => a + b) / buffer.length;
@@ -192,7 +190,6 @@ export default function run() {
 				video.srcObject = stream;
 				video.addEventListener("loadedmetadata", function() { // used to have an e here
 					video.play();
-					/* eslint-disable no-console */
 					console.log("Webcam video successfully loaded");
 					loop();
 				})
