@@ -1,13 +1,13 @@
-<template>	
+<template>
 	<div>
 		<section>
 			<header>
-					<a href="http://www.washington.edu/">
-						<img src="whiteLogo2.png" alt="UW Logo" width="90" height="60" class="UW-logo">
-					</a>
-					<a href="http://www.washington.edu/">
-						<img src="whiteLogo.png" alt="UW Logo" width="260" height="24" class="UW-text">
-					</a>
+				<a href="http://www.washington.edu/">
+					<img src="whiteLogo2.png" alt="UW Logo" width="90" height="60" class="UW-logo">
+				</a>
+				<a href="http://www.washington.edu/">
+					<img src="whiteLogo.png" alt="UW Logo" width="260" height="24" class="UW-text">
+				</a>
 			</header>
 			<h3>Build by teams from</h3>
 			<div class="flex-container">
@@ -19,7 +19,9 @@
 				</div>
 				<div style="flex-grow: 1">
 					<a href="https://scholar.google.com/citations?user=m7Jr-b4AAAAJ&hl=en">
-						<img src='circle-cropped.png' alt="Dave McDuff" width="110" height="110">
+						<p>Daniel McDuff</p>
+						<!--img src='circle-cropped.png' alt="Dave McDuff" width="110" height="110">
+							<figcaption>Daniel McDuff</figcaption-->
 					</a>
 				</div>
 				<div stype="flex-grow: 3" class="col-md-1"></div>
@@ -62,7 +64,14 @@
 		text-align: center;
 		font-size: 55px;
 	}
-	
+
+	#images a {
+		margin: 0px 20px;
+		display: inline-block;
+		text-decoration: none;
+		color: black;
+	}
+
 	footer {
 		background-color: #330066;
 		padding: 40px;
@@ -82,7 +91,7 @@
 		left: 300px;
 		top: 50px;
 	}
-	
+
 	.flex-container {
 		display: flex;
 		height: 150px;
@@ -109,5 +118,4 @@
 		margin: 30px;
 		padding: 0px;
 	}
-
 </style>
