@@ -3,10 +3,10 @@
 		<section>
 			<header>
 				<a href="http://www.washington.edu/">
-					<img src="whiteLogo2.png" alt="UW Logo" width="90" height="60" class="UW-logo">
+					<img src="UWlogo3.png" alt="UW Logo" width="90" height="60" class="UW-logo">
 				</a>
 				<a href="http://www.washington.edu/">
-					<img src="whiteLogo.png" alt="UW Logo" width="260" height="24" class="UW-text">
+					<img src="UWlogo2.png" alt="UW Logo" width="260" height="24" class="UW-text">
 				</a>
 			</header>
 			<h3>Build by teams from</h3>
@@ -14,7 +14,7 @@
 				<div stype="flex-grow: 3" class="col-md-1"></div>
 				<div style="flex-grow: 1">
 					<a href="https://www.cs.washington.edu/">
-						<img src="logo4.png" alt="Paul G.Allen School of Computer Science & Engineering" width="400" height="80">
+						<img src="UWlogo1.png" alt="Paul G.Allen School of Computer Science & Engineering" width="400" height="80">
 					</a>
 				</div>
 				<div style="flex-grow: 1">
@@ -34,7 +34,7 @@
 		<div id="chart_resp"></div>
 		<footer>
 			<a href="http://www.washington.edu/">
-				<img src="whiteLogo.png" alt="UW Logo" width="260" height="24">
+				<img src="UWlogo2.png" alt="UW Logo" width="260" height="24">
 				<p style="font-size:0.6875rem; color:white">© 2020 University of Washington | Seattle, WA</p>
 			</a>
 		</footer>
