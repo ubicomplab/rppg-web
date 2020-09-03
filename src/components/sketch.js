@@ -86,9 +86,7 @@ export default function run() {
 		console.log("Successfully loaded ml model");
 	}
 
-	let loopId;
-
-	async function loop() {
+	function loop() {
 		orig_v = tf.browser.fromPixels(video); // update Frame
 		preprocess();
 
@@ -104,10 +102,6 @@ export default function run() {
 				buffer_size = movingAvg_resp.length;
 			}
 		}
-		if (loopId) {
-			clearTimeout(loopId);
-		}
-		loopId = setTimeout(loop, 10);
 	}
 
 	// Preprocess a frame of video, and once Batch and diffBatch hit 20, 
@@ -196,7 +190,7 @@ export default function run() {
 				video.addEventListener("loadedmetadata", function() { // used to have an e here
 					video.play();
 					console.log("Webcam video successfully loaded");
-					loop();
+					setInterval(loop, 20);
 				})
 			});
 		}
