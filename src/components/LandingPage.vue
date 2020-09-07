@@ -27,7 +27,7 @@
 					<a href="https://homes.cs.washington.edu/~shwetak/">Shwetak Patel</a>,
 					<a href="https://www.microsoft.com/en-us/research/people/damcduff/">Daniel McDuff</a></i><br>
 					<br>
-				<a href="NIPS2020_MTTS_CAN_preprint.pdf">Download PDF</a>
+				<a href="NIPS2020_MTTS_CAN_preprint.pdf"><h3>Download PDF</h3></a>
 			</div>
 
 
