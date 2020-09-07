@@ -17,15 +17,20 @@
 						<img src="UWlogo1.png" alt="Paul G.Allen School of Computer Science & Engineering" width="400" height="80">
 					</a>
 				</div>
-				<div style="flex-grow: 1">
-					<a href="https://scholar.google.com/citations?user=m7Jr-b4AAAAJ&hl=en">
-						<p>Daniel McDuff</p>
-						<!--img src='circle-cropped.png' alt="Dave McDuff" width="110" height="110">
-							<figcaption>Daniel McDuff</figcaption-->
-					</a>
-				</div>
 				<div stype="flex-grow: 3" class="col-md-1"></div>
 			</div>
+			<div class="center">
+				<h3><b>Research Paper</b></h3>
+				<b><p>Multi-Task Temporal Shift Attention Networks for On-Device Contactless Vitals Measurement</p></b>
+				<i><a href="https://homes.cs.washington.edu/~xliu0/">Xin Liu</a>,
+					<a href="https://www.jwfromm.com/">Josh Fromm</a>,
+					<a href="https://homes.cs.washington.edu/~shwetak/">Shwetak Patel</a>,
+					<a href="https://www.microsoft.com/en-us/research/people/damcduff/">Daniel McDuff</a></i><br>
+					<br>
+				<a href="NIPS2020_MTTS_CAN_preprint.pdf">Download PDF</a>
+			</div>
+
+
 		</section>
 		<div id="WebCam">
 			<video autodisplay="true" height="400" width="400" id="video" alighn="center"></video>
@@ -78,6 +83,14 @@
 		text-align: center;
 		font-size: 55px;
 		color: white;
+	}
+
+	.center {
+		margin: auto;
+		width: 60%;
+		background-color: aliceblue;
+		border: 3px solid #FFFFFF;
+		padding: 10px;
 	}
 
 	.UW-logo {
