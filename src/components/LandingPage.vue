@@ -21,15 +21,24 @@
 			</div>
 			<div class="center">
 				<h3><b>Research Paper</b></h3>
-				<b><p>Multi-Task Temporal Shift Attention Networks for On-Device Contactless Vitals Measurement</p></b>
+				<b>
+					<p>Multi-Task Temporal Shift Attention Networks for On-Device Contactless Vitals Measurement</p>
+				</b>
 				<i><a href="https://homes.cs.washington.edu/~xliu0/">Xin Liu</a>,
 					<a href="https://www.jwfromm.com/">Josh Fromm</a>,
 					<a href="https://homes.cs.washington.edu/~shwetak/">Shwetak Patel</a>,
 					<a href="https://www.microsoft.com/en-us/research/people/damcduff/">Daniel McDuff</a></i><br>
-					<br>
-				<a href="NIPS2020_MTTS_CAN_preprint.pdf"><h3>Download PDF</h3></a>
+				<br>
+				<a href="NIPS2020_MTTS_CAN_preprint.pdf">
+					<h3>Download PDF</h3>
+				</a>
 			</div>
 
+			<section class="demo">
+				<div style="width:800px; margin:0 auto;">
+					<button class="button" onlick="run">Open the Webcam to Run the Demo!</button>
+				</div>
+			</section>
 
 		</section>
 		<div id="WebCam">
@@ -130,5 +139,23 @@
 		float: left;
 		margin: 30px;
 		padding: 0px;
+	}
+
+	.demo {
+		text-align: center;
+		padding: 30px;
+	}
+
+	.button {
+		background-color: #330066;
+		/* Green */
+		color: white;
+		padding: 15px 32px;
+		font-size: 16px;
+		text-align: center;
+	}
+
+	.button:hover {
+		background-color: darkgoldenrod;
 	}
 </style>
