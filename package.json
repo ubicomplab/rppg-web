@@ -16,6 +16,7 @@
   },
   "pre-commit": "lint:staged",
   "dependencies": {
+    "@tensorflow/tfjs": "^2.3.0",
     "next": "9.5.3",
     "prop-types": "15.7.2",
     "react": "16.13.1",
