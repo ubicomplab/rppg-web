@@ -1,6 +1,7 @@
 import React from 'react';
 import Head from 'next/head';
-import styles from '../styles/Home.module.scss';
+import Header from '../components/header';
+import Research from '../components/research';
 
 export default function Home() {
   return (
@@ -9,44 +10,8 @@ export default function Home() {
         <title>RPPG</title>
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <header className={styles.header}>
-        <a href="http://www.washington.edu/">
-          <img
-            src="/images/UWlogo3.png"
-            alt="UW Logo"
-            width="90"
-            height="60"
-            className="UW-logo"
-          />
-          <img
-            src="/images/UWlogo2.png"
-            alt="UW Logo"
-            width="260"
-            height="24"
-            className="UW-text"
-          />
-        </a>
-      </header>
-      <div>
-        <h3>
-          <b>Research Paper</b>
-        </h3>
-        <b>
-          <p>
-            Multi-Task Temporal Shift Attention Networks for On-Device
-            Contactless Vitals Measurement
-          </p>
-        </b>
-        <a href="https://homes.cs.washington.edu/~xliu0/">Xin Liu</a>,
-        <a href="https://www.jwfromm.com/">Josh Fromm</a>,
-        <a href="https://homes.cs.washington.edu/~shwetak/">Shwetak Patel</a>,
-        <a href="https://www.microsoft.com/en-us/research/people/damcduff/">
-          Daniel McDuff
-        </a>
-        <a href="NIPS2020_MTTS_CAN_preprint.pdf">
-          <h3>Download PDF</h3>
-        </a>
-      </div>
+      <Header />
+      <Research />
     </div>
   );
 }
