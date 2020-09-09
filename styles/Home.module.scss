@@ -1,0 +1,17 @@
+.recordingButton {
+    display: block;
+    padding: 8px;
+    background-color: white;
+    border: 0.5px solid grey;
+    border-radius: 8px;
+    margin: 8px;
+    &:focus {
+       outline: none;
+    }
+}
+
+.contentContainer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
