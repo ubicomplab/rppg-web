@@ -31,6 +31,7 @@ const Home = () => {
   const capture = () => {
     if (webcamRef) {
       const imageSrc = webcamRef.current.getScreenshot();
+      if (imageSrc === null) return;
       const img = new Image(36, 36);
       img.src = imageSrc;
       const origV = browser.fromPixels(img);
