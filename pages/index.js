@@ -5,15 +5,19 @@ import { browser } from '@tensorflow/tfjs';
 import Header from '../components/header';
 import Research from '../components/research';
 import styles from '../styles/Home.module.scss';
+import TensorStore from '../ultils/tensorStore';
 
 const Home = () => {
   const webcamRef = React.useRef(null);
   const [interValeId, setIntervalId] = useState(null);
+  const [consumeIntervalId, setConsumeIntervalId] = useState(null);
   const [isRecording, setRecording] = useState(false);
+  const tensorStore = new TensorStore();
 
   useEffect(
     () => () => {
       clearInterval(interValeId);
+      clearInterval(consumeIntervalId);
     },
     [interValeId]
   );
@@ -21,9 +25,12 @@ const Home = () => {
   const handleRecording = () => {
     if (!isRecording) {
       const id = setInterval(capture, 20);
+      const cId = setInterval(comsume, 500);
       setIntervalId(id);
+      setConsumeIntervalId(cId);
     } else {
       clearInterval(interValeId);
+      clearInterval(consumeIntervalId);
     }
     setRecording(!isRecording);
   };
@@ -35,8 +42,12 @@ const Home = () => {
       const img = new Image(36, 36);
       img.src = imageSrc;
       const origV = browser.fromPixels(img);
-      console.log(origV);
+      tensorStore.addTensor(origV);
     }
+  };
+
+  const comsume = () => {
+    tensorStore.getTensor();
   };
 
   return (
