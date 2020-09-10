@@ -25,7 +25,7 @@ const Home = () => {
   const handleRecording = () => {
     if (!isRecording) {
       const id = setInterval(capture, 20);
-      const cId = setInterval(comsume, 500);
+      const cId = setInterval(comsume, 200);
       setIntervalId(id);
       setConsumeIntervalId(cId);
     } else {
