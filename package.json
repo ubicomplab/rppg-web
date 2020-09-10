@@ -16,13 +16,14 @@
   },
   "pre-commit": "lint:staged",
   "dependencies": {
-    "@tensorflow/tfjs": "^2.3.0",
+    "@tensorflow/tfjs": "2.3.0",
+    "lodash": "4.17.20",
     "next": "9.5.3",
     "prop-types": "15.7.2",
     "react": "16.13.1",
     "react-dom": "16.13.1",
-    "react-webcam": "^5.2.0",
-    "sass": "^1.26.10"
+    "react-webcam": "5.2.0",
+    "sass": "1.26.10"
   },
   "devDependencies": {
     "babel-eslint": "10.0.1",
