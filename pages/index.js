@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { throttle } from 'lodash';
 import Head from 'next/head';
 import Webcam from 'react-webcam';
 import { browser } from '@tensorflow/tfjs';
@@ -7,16 +6,20 @@ import Header from '../components/header';
 import Research from '../components/research';
 import styles from '../styles/Home.module.scss';
 import TensorStore from '../ultils/tensorStore';
+import PreProcess from '../ultils/preProcess';
 
 const Home = () => {
   const webcamRef = React.useRef(null);
   const [interValeId, setIntervalId] = useState(null);
+  const [consumeIntervalId, setConsumeIntervalId] = useState(null);
   const [isRecording, setRecording] = useState(false);
   const tensorStore = new TensorStore();
+  const preprocess = new PreProcess(tensorStore);
 
   useEffect(
     () => () => {
       clearInterval(interValeId);
+      clearInterval(consumeIntervalId);
     },
     [interValeId]
   );
@@ -24,9 +27,12 @@ const Home = () => {
   const handleRecording = () => {
     if (!isRecording) {
       const id = setInterval(capture, 20);
+      const cId = setInterval(comsume, 500);
       setIntervalId(id);
+      setConsumeIntervalId(cId);
     } else {
       clearInterval(interValeId);
+      clearInterval(consumeIntervalId);
     }
     setRecording(!isRecording);
   };
@@ -39,17 +45,13 @@ const Home = () => {
       img.src = imageSrc;
       const origV = browser.fromPixels(img);
       tensorStore.addTensor(origV);
-      throttleConsume();
+      preprocess.compute(tensorStore.getTensor());
     }
   };
 
-  /*
-    use throttle to ensure constance consumption rate, and ensure postprocessing is in order
-  */
-  const throttleConsume = throttle(() => {
-    // do postprocess here
+  const comsume = () => {
     tensorStore.getTensor();
-  }, 150);
+  };
 
   return (
     <>
