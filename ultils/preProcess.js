@@ -25,7 +25,6 @@ class PreProcess {
       Xsub2 = tf.div(Xsub2, tf.moments(Xsub2).variance.sqrt()); // Xsub = Xsub - Xsub.mean(axis = 0
 
       if (this.rawBatch.length === 0) {
-        console.log('here cast');
         this.rawBatch = tf.cast(Xsub, 'float32');
         this.diffBatch = tf.cast(dXsub, 'float32');
       } else {
