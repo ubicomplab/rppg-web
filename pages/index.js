@@ -1,12 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import Head from 'next/head';
 import Webcam from 'react-webcam';
-import { browser } from '@tensorflow/tfjs';
+import * as tf from '@tensorflow/tfjs';
 import Header from '../components/header';
 import Research from '../components/research';
 import styles from '../styles/Home.module.scss';
 import TensorStore from '../ultils/tensorStore';
 import PreProcess from '../ultils/preProcess';
+import PostProcess from '../ultils/postProcess';
+import AttentionMask from '../ultils/AttentionMask';
+import TSM from '../ultils/TSM';
 
 const Home = () => {
   const webcamRef = React.useRef(null);
@@ -14,7 +17,13 @@ const Home = () => {
   const [consumeIntervalId, setConsumeIntervalId] = useState(null);
   const [isRecording, setRecording] = useState(false);
   const tensorStore = new TensorStore();
-  const preprocess = new PreProcess(tensorStore);
+  const preprocess = new PreProcess();
+  const postprocess = new PostProcess();
+  const path = 'model.json';
+  const batchSize = 20;
+  let model;
+  tf.serialization.registerClass(TSM);
+  tf.serialization.registerClass(AttentionMask);
 
   useEffect(
     () => () => {
@@ -23,6 +32,19 @@ const Home = () => {
     },
     [interValeId]
   );
+
+  const getModel = async modelPath => {
+    model = await tf.loadLayersModel(modelPath);
+    console.log('successfully loaded ml model');
+  };
+
+  getModel(path);
+
+  const getPrediction = async input => {
+    const prediction = await model.predict(input);
+    postprocess.compute(prediction);
+    return prediction;
+  };
 
   const handleRecording = () => {
     if (!isRecording) {
@@ -43,9 +65,16 @@ const Home = () => {
       if (imageSrc === null) return;
       const img = new Image(36, 36);
       img.src = imageSrc;
-      const origV = browser.fromPixels(img);
+      const origV = tf.browser.fromPixels(img);
       tensorStore.addTensor(origV);
+
       preprocess.compute(tensorStore.getTensor());
+
+      if (preprocess.getCounter() === batchSize) {
+        const batch = preprocess.getBatch();
+        preprocess.clear();
+        getPrediction(batch);
+      }
     }
   };
 
