@@ -2,42 +2,60 @@ import * as tf from '@tensorflow/tfjs';
 
 class PreProcess {
   constructor() {
+    // this.rawBatch stores the processed Batch based on the original frame
     this.rawBatch = [];
-    this.diffBatch = [];
+    // this.normalizedBatch stores the processed Batch based on the original fram
+    this.normalizedBatch = [];
     this.prevFrame = null;
     this.counter = 0;
   }
 
   compute(origV) {
-    let Xsub = origV.asType('float32').div(tf.scalar(255));
-    Xsub = Xsub.expandDims(0); // (1, 36, 36, 3)
+    const time = new Date();
+    // expandOrigV takes original frame data and scale it to [0, 1], and expand dimension
+    const expandOrigV = origV
+      .asType('float32')
+      .div(tf.scalar(255))
+      .expandDims(0); // (1, 36, 36, 3)
 
     if (this.prevFrame != null) {
-      // FRAME DIFF:
-      let dXsub = tf.div(
-        tf.sub(Xsub, this.prevFrame),
-        tf.add(Xsub, this.prevFrame)
+      // Normalized frame = (F[t+1] - F[t]) / (F[t+1] + F[t])
+      let normalizedFrame = tf.div(
+        tf.sub(expandOrigV, this.prevFrame),
+        tf.add(expandOrigV, this.prevFrame)
       );
-      let Xsub2 = tf.sub(Xsub, tf.mean(Xsub)); // Xsub = Xsub - Xsub.mean(axis = 0)
+
+      // meanNormalize = F[t] - mean(F)
+      let meanNormalize = tf.sub(expandOrigV, tf.mean(expandOrigV));
 
       // SUBTRACT MEAN OF IMG:
-      dXsub = tf.div(dXsub, tf.moments(dXsub).variance.sqrt()); // dxsub / np.std(dxsub,ddof=1)
-      Xsub2 = tf.div(Xsub2, tf.moments(Xsub2).variance.sqrt()); // Xsub = Xsub - Xsub.mean(axis = 0
+      normalizedFrame = tf.div(
+        normalizedFrame,
+        tf.moments(normalizedFrame).variance.sqrt()
+      );
+      meanNormalize = tf.div(
+        meanNormalize,
+        tf.moments(meanNormalize).variance.sqrt()
+      );
 
       if (this.rawBatch.length === 0) {
-        this.rawBatch = tf.cast(Xsub, 'float32');
-        this.diffBatch = tf.cast(dXsub, 'float32');
+        this.rawBatch = tf.cast(expandOrigV, 'float32');
+        this.normalizedBatch = tf.cast(normalizedFrame, 'float32');
       } else {
-        this.rawBatch = tf.concat([this.rawBatch, Xsub2]);
-        this.diffBatch = tf.concat([this.diffBatch, dXsub]);
+        this.rawBatch = tf.concat([this.rawBatch, meanNormalize]);
+        this.normalizedBatch = tf.concat([
+          this.normalizedBatch,
+          normalizedFrame
+        ]);
       }
       this.counter += 1;
     }
-    this.prevFrame = Xsub;
+    this.prevFrame = expandOrigV;
+    console.log(new Date() - time);
   }
 
   getBatch() {
-    return [this.diffBatch, this.rawBatch];
+    return [this.normalizedBatch, this.rawBatch];
   }
 
   getCounter() {
@@ -46,7 +64,7 @@ class PreProcess {
 
   clear() {
     this.rawBatch = [];
-    this.diffBatch = [];
+    this.normalizedBatch = [];
     this.counter = 0;
   }
 }
