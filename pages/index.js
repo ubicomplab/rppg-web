@@ -27,15 +27,19 @@ const Home = () => {
   // tf.serialization.registerClass(TSM);
   // tf.serialization.registerClass(AttentionMask);
 
-  useEffect(() => {
-    // getModel(path);
-    console.log();
-    return () => {
-      clearInterval(interValeId);
-      preprocessor.stopProcess();
-    };
-  }, []);
+  useEffect(
+    () => () => {
+      clearInterval();
+    },
+    [interValeId]
+  );
 
+  useEffect(
+    () => () => {
+      preprocessor.stopProcess();
+    },
+    []
+  );
   // const getModel = async modelPath => {
   //   model = await tf.loadLayersModel(modelPath);
   //   console.log('successfully loaded ml model');
