@@ -7,25 +7,16 @@ import Research from '../components/research';
 import styles from '../styles/Home.module.scss';
 import tensorStore from '../lib/tensorStore';
 import Preprocessor from '../lib/preprocessor';
-// import PreProcess from '../ultils/preProcess';
-// import PostProcess from '../ultils/postProcess';
-// import AttentionMask from '../ultils/AttentionMask';
-// import TSM from '../ultils/TSM';
+import Posprocessor from '../lib/posprocessor';
 
-// const path = 'model.json';
-// let model = null;
-
+let video;
 const preprocessor = new Preprocessor(tensorStore);
+const postprocessor = new Posprocessor(tensorStore);
 
 const Home = () => {
   const webcamRef = React.useRef(null);
   const [interValeId, setIntervalId] = useState(null);
   const [isRecording, setRecording] = useState(false);
-  // const preprocess = new PreProcess();
-  // const postprocess = new PostProcess();
-  // const batchSize = 20;
-  // tf.serialization.registerClass(TSM);
-  // tf.serialization.registerClass(AttentionMask);
 
   useEffect(
     () => () => {
@@ -37,19 +28,11 @@ const Home = () => {
   useEffect(
     () => () => {
       preprocessor.stopProcess();
+      postprocessor.stopProcess();
+      tensorStore.reset();
     },
     []
   );
-  // const getModel = async modelPath => {
-  //   model = await tf.loadLayersModel(modelPath);
-  //   console.log('successfully loaded ml model');
-  // };
-
-  // const getPrediction = async input => {
-  //   const prediction = await model.predict(input);
-  //   postprocess.compute(prediction);
-  //   return prediction;
-  // };
 
   const handleRecording = () => {
     if (!isRecording) {
@@ -59,32 +42,25 @@ const Home = () => {
     } else {
       clearInterval(interValeId);
       preprocessor.stopProcess();
+      postprocessor.stopProcess();
     }
     setRecording(!isRecording);
   };
 
-  const capture = () => {
+  const capture = React.useCallback(() => {
     if (webcamRef) {
-      const imageSrc = webcamRef.current.getScreenshot();
-      if (imageSrc === null) return;
-      const img = new Image(36, 36);
-      img.src = imageSrc;
-      const origV = tf.browser.fromPixels(img);
-      tensorStore.addRawTensor(origV);
-
-      // preprocess.compute(tensorStore.getTensor());
-
-      // if (preprocess.getCounter() === batchSize) {
-      //   const batch = preprocess.getBatch();
-      //   preprocess.clear();
-      //   getPrediction(batch);
-      // }
+      try {
+        if (!video) {
+          video = document.getElementById('camera');
+        }
+        const origV = tf.browser.fromPixels(video);
+        tensorStore.addRawTensor(origV);
+        console.log(tf.memory());
+      } catch {
+        //
+      }
     }
-  };
-
-  // const comsume = () => {
-  //   tensorStore.getTensor();
-  // };
+  }, [webcamRef]);
 
   return (
     <>
@@ -96,7 +72,12 @@ const Home = () => {
       <div className={styles.contentContainer}>
         <Research />
         {isRecording && (
-          <Webcam audio={false} ref={webcamRef} screenshotFormat="image/jpeg" />
+          <Webcam
+            id="camera"
+            audio={false}
+            ref={webcamRef}
+            screenshotFormat="image/jpeg"
+          />
         )}
         <button
           className={styles.recordingButton}
