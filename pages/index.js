@@ -5,56 +5,56 @@ import * as tf from '@tensorflow/tfjs';
 import Header from '../components/header';
 import Research from '../components/research';
 import styles from '../styles/Home.module.scss';
-import TensorStore from '../ultils/tensorStore';
-import PreProcess from '../ultils/preProcess';
-import PostProcess from '../ultils/postProcess';
-import AttentionMask from '../ultils/AttentionMask';
-import TSM from '../ultils/TSM';
+import tensorStore from '../lib/tensorStore';
+import Preprocessor from '../lib/preprocessor';
+// import PreProcess from '../ultils/preProcess';
+// import PostProcess from '../ultils/postProcess';
+// import AttentionMask from '../ultils/AttentionMask';
+// import TSM from '../ultils/TSM';
+
+// const path = 'model.json';
+// let model = null;
+
+const preprocessor = new Preprocessor(tensorStore);
 
 const Home = () => {
   const webcamRef = React.useRef(null);
   const [interValeId, setIntervalId] = useState(null);
-  const [consumeIntervalId, setConsumeIntervalId] = useState(null);
   const [isRecording, setRecording] = useState(false);
-  const tensorStore = new TensorStore();
-  const preprocess = new PreProcess();
-  const postprocess = new PostProcess();
-  const path = 'model.json';
-  const batchSize = 20;
-  let model;
-  tf.serialization.registerClass(TSM);
-  tf.serialization.registerClass(AttentionMask);
+  // const preprocess = new PreProcess();
+  // const postprocess = new PostProcess();
+  // const batchSize = 20;
+  // tf.serialization.registerClass(TSM);
+  // tf.serialization.registerClass(AttentionMask);
 
-  useEffect(
-    () => () => {
+  useEffect(() => {
+    // getModel(path);
+    console.log();
+    return () => {
       clearInterval(interValeId);
-      clearInterval(consumeIntervalId);
-    },
-    [interValeId]
-  );
+      preprocessor.stopProcess();
+    };
+  }, []);
 
-  const getModel = async modelPath => {
-    model = await tf.loadLayersModel(modelPath);
-    console.log('successfully loaded ml model');
-  };
+  // const getModel = async modelPath => {
+  //   model = await tf.loadLayersModel(modelPath);
+  //   console.log('successfully loaded ml model');
+  // };
 
-  getModel(path);
-
-  const getPrediction = async input => {
-    const prediction = await model.predict(input);
-    postprocess.compute(prediction);
-    return prediction;
-  };
+  // const getPrediction = async input => {
+  //   const prediction = await model.predict(input);
+  //   postprocess.compute(prediction);
+  //   return prediction;
+  // };
 
   const handleRecording = () => {
     if (!isRecording) {
       const id = setInterval(capture, 20);
-      const cId = setInterval(comsume, 500);
       setIntervalId(id);
-      setConsumeIntervalId(cId);
+      preprocessor.startProcess();
     } else {
       clearInterval(interValeId);
-      clearInterval(consumeIntervalId);
+      preprocessor.stopProcess();
     }
     setRecording(!isRecording);
   };
@@ -66,21 +66,21 @@ const Home = () => {
       const img = new Image(36, 36);
       img.src = imageSrc;
       const origV = tf.browser.fromPixels(img);
-      tensorStore.addTensor(origV);
+      tensorStore.addRawTensor(origV);
 
-      preprocess.compute(tensorStore.getTensor());
+      // preprocess.compute(tensorStore.getTensor());
 
-      if (preprocess.getCounter() === batchSize) {
-        const batch = preprocess.getBatch();
-        preprocess.clear();
-        getPrediction(batch);
-      }
+      // if (preprocess.getCounter() === batchSize) {
+      //   const batch = preprocess.getBatch();
+      //   preprocess.clear();
+      //   getPrediction(batch);
+      // }
     }
   };
 
-  const comsume = () => {
-    tensorStore.getTensor();
-  };
+  // const comsume = () => {
+  //   tensorStore.getTensor();
+  // };
 
   return (
     <>
