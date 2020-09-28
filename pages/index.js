@@ -69,7 +69,7 @@ const Home = () => {
         <Research />
         {isRecording && (
           <Webcam
-            id="camera"
+            mirrored
             audio={false}
             ref={webcamRef}
             screenshotFormat="image/jpeg"
