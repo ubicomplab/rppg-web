@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Head from 'next/head';
 import Webcam from 'react-webcam';
-import * as tf from '@tensorflow/tfjs';
+import { browser } from '@tensorflow/tfjs';
 import Header from '../components/header';
 import Research from '../components/research';
 import styles from '../styles/Home.module.scss';
@@ -9,7 +9,6 @@ import tensorStore from '../lib/tensorStore';
 import Preprocessor from '../lib/preprocessor';
 import Posprocessor from '../lib/posprocessor';
 
-let video;
 const preprocessor = new Preprocessor(tensorStore);
 const postprocessor = new Posprocessor(tensorStore);
 
@@ -36,7 +35,7 @@ const Home = () => {
 
   const handleRecording = () => {
     if (!isRecording) {
-      const id = setInterval(capture, 20);
+      const id = setInterval(capture, 30);
       setIntervalId(id);
       preprocessor.startProcess();
     } else {
@@ -50,15 +49,12 @@ const Home = () => {
 
   const capture = React.useCallback(() => {
     if (webcamRef) {
-      try {
-        if (!video) {
-          video = document.getElementById('camera');
-        }
-        const origV = tf.browser.fromPixels(video);
-        tensorStore.addRawTensor(origV);
-      } catch {
-        //
-      }
+      const imageSrc = webcamRef.current.getScreenshot();
+      if (imageSrc === null) return;
+      const img = new Image(36, 36);
+      img.src = imageSrc;
+      const origV = browser.fromPixels(img);
+      tensorStore.addRawTensor(origV);
     }
   }, [webcamRef]);
 
