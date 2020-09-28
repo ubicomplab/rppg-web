@@ -29,7 +29,7 @@ const Home = () => {
     () => () => {
       preprocessor.stopProcess();
       postprocessor.stopProcess();
-      tensorStore.reset();
+      // tensorStore.reset();
     },
     []
   );
@@ -43,6 +43,7 @@ const Home = () => {
       clearInterval(interValeId);
       preprocessor.stopProcess();
       postprocessor.stopProcess();
+      tensorStore.reset();
     }
     setRecording(!isRecording);
   };
@@ -55,7 +56,6 @@ const Home = () => {
         }
         const origV = tf.browser.fromPixels(video);
         tensorStore.addRawTensor(origV);
-        console.log(tf.memory());
       } catch {
         //
       }
