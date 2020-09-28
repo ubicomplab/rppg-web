@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Line } from 'react-chartjs-2';
 import Head from 'next/head';
 import Webcam from 'react-webcam';
 import { browser } from '@tensorflow/tfjs';
@@ -12,10 +13,36 @@ import Posprocessor from '../lib/posprocessor';
 const preprocessor = new Preprocessor(tensorStore);
 const postprocessor = new Posprocessor(tensorStore);
 
+const config = {
+  label: 'My First dataset',
+  fill: false,
+  lineTension: 0.1,
+  backgroundColor: 'rgba(75,192,192,0.4)',
+  borderColor: 'rgba(75,192,192,1)',
+  borderCapStyle: 'butt',
+  borderDash: [],
+  borderDashOffset: 0.0,
+  borderJoinStyle: 'miter',
+  pointBorderColor: 'rgba(75,192,192,1)',
+  pointBackgroundColor: '#fff',
+  pointBorderWidth: 1,
+  pointHoverRadius: 5,
+  pointHoverBackgroundColor: 'rgba(75,192,192,1)',
+  pointHoverBorderColor: 'rgba(220,220,220,1)',
+  pointHoverBorderWidth: 2,
+  pointRadius: 1,
+  pointHitRadius: 10,
+  cubicInterpolationMode: 'monotone'
+};
+
 const Home = () => {
   const webcamRef = React.useRef(null);
   const [interValeId, setIntervalId] = useState(null);
   const [isRecording, setRecording] = useState(false);
+  const [charData, setCharData] = useState({
+    labels: [],
+    data: []
+  });
 
   useEffect(
     () => () => {
@@ -28,7 +55,7 @@ const Home = () => {
     () => () => {
       preprocessor.stopProcess();
       postprocessor.stopProcess();
-      // tensorStore.reset();
+      tensorStore.reset();
     },
     []
   );
@@ -38,6 +65,7 @@ const Home = () => {
       const id = setInterval(capture, 30);
       setIntervalId(id);
       preprocessor.startProcess();
+      postprocessor.startProcess(updateGraph);
     } else {
       clearInterval(interValeId);
       preprocessor.stopProcess();
@@ -45,6 +73,10 @@ const Home = () => {
       tensorStore.reset();
     }
     setRecording(!isRecording);
+  };
+
+  const updateGraph = (labels, data) => {
+    setCharData({ labels, data });
   };
 
   const capture = React.useCallback(() => {
@@ -58,6 +90,15 @@ const Home = () => {
     }
   }, [webcamRef]);
 
+  const plotData = {
+    labels: charData.labels,
+    datasets: [
+      {
+        ...config,
+        data: charData.data
+      }
+    ]
+  };
   return (
     <>
       <Head>
@@ -82,6 +123,7 @@ const Home = () => {
         >
           {isRecording ? 'Stop Recording' : 'Start Recording'}
         </button>
+        <Line data={plotData} options={{ animation: false }} />
       </div>
     </>
   );
