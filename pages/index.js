@@ -85,8 +85,10 @@ const Home = () => {
       if (imageSrc === null) return;
       const img = new Image(36, 36);
       img.src = imageSrc;
-      const origV = browser.fromPixels(img);
-      tensorStore.addRawTensor(origV);
+      img.onload = () => {
+        const origV = browser.fromPixels(img);
+        tensorStore.addRawTensor(origV);
+      };
     }
   }, [webcamRef]);
 
