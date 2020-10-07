@@ -125,7 +125,7 @@ const Home = () => {
         >
           {isRecording ? 'Stop Recording' : 'Start Recording'}
         </button>
-        <Line data={plotData} options={{ animation: false }} />
+        <Line data={plotData} options={{ animation: true }} />
       </div>
     </>
   );
