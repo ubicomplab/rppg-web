@@ -31,13 +31,13 @@ const config = {
   pointHoverBorderColor: 'rgba(220,220,220,1)',
   pointHoverBorderWidth: 2,
   pointRadius: 1,
-  pointHitRadius: 10,
-  cubicInterpolationMode: 'monotone'
+  pointHitRadius: 10
 };
 
 const Home = () => {
   const webcamRef = React.useRef(null);
-  const [interValeId, setIntervalId] = useState(null);
+  const intervalId = React.useRef(null);
+  const plotIntervalId = React.useRef(null);
   const [isRecording, setRecording] = useState(false);
   const [charData, setCharData] = useState({
     labels: [],
@@ -46,9 +46,9 @@ const Home = () => {
 
   useEffect(
     () => () => {
-      clearInterval();
+      clearInterval(intervalId.current);
     },
-    [interValeId]
+    [intervalId]
   );
 
   useEffect(
@@ -62,21 +62,18 @@ const Home = () => {
 
   const handleRecording = () => {
     if (!isRecording) {
-      const id = setInterval(capture, 30);
-      setIntervalId(id);
+      intervalId.current = setInterval(capture, 30);
+      plotIntervalId.current = setInterval(plotGraph, 100);
       preprocessor.startProcess();
-      postprocessor.startProcess(updateGraph);
+      postprocessor.startProcess();
     } else {
-      clearInterval(interValeId);
+      clearInterval(intervalId.current);
+      clearInterval(plotIntervalId.current);
       preprocessor.stopProcess();
       postprocessor.stopProcess();
       tensorStore.reset();
     }
     setRecording(!isRecording);
-  };
-
-  const updateGraph = (labels, data) => {
-    setCharData({ labels, data });
   };
 
   const capture = React.useCallback(() => {
@@ -91,6 +88,29 @@ const Home = () => {
       };
     }
   }, [webcamRef]);
+
+  const plotGraph = () => {
+    const dataPoint = tensorStore.getRppgPltData();
+    if (dataPoint) {
+      const now = new Date();
+      const newLabels =
+        charData.labels.length >= 60
+          ? charData.labels.slice(1)
+          : charData.labels;
+      newLabels.push(
+        `${now.getHours()}:${now.getMinutes()}:${now.getSeconds()}:${now.getMilliseconds()}`
+      );
+
+      const newData =
+        charData.data.length >= 60 ? charData.data.slice(1) : charData.data;
+      newData.push(dataPoint);
+
+      setCharData({
+        labels: newLabels,
+        data: newData
+      });
+    }
+  };
 
   const plotData = {
     labels: charData.labels,
