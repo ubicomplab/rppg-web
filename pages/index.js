@@ -10,8 +10,8 @@ import tensorStore from '../lib/tensorStore';
 import Preprocessor from '../lib/preprocessor';
 import Posprocessor from '../lib/posprocessor';
 
-const preprocessor = new Preprocessor(tensorStore);
 const postprocessor = new Posprocessor(tensorStore);
+const preprocessor = new Preprocessor(tensorStore, postprocessor);
 
 const config = {
   label: 'My First dataset',
@@ -54,23 +54,22 @@ const Home = () => {
   useEffect(
     () => () => {
       preprocessor.stopProcess();
-      postprocessor.stopProcess();
+      // postprocessor.stopProcess();
       tensorStore.reset();
     },
     []
   );
 
-  const handleRecording = () => {
+  const handleRecording = async () => {
     if (!isRecording) {
+      await postprocessor.loadModel();
       intervalId.current = setInterval(capture, 30);
       plotIntervalId.current = setInterval(plotGraph, 30);
       preprocessor.startProcess();
-      postprocessor.startProcess();
     } else {
       clearInterval(intervalId.current);
       clearInterval(plotIntervalId.current);
       preprocessor.stopProcess();
-      postprocessor.stopProcess();
       tensorStore.reset();
       setCharData({ labels: [], data: [] });
     }
