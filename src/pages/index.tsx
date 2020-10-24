@@ -34,19 +34,26 @@ const config = {
   pointHitRadius: 10
 };
 
+type GraphProps = {
+  labels: string[];
+  data: number[];
+};
+
 const Home = () => {
-  const webcamRef = React.useRef(null);
-  const intervalId = React.useRef(null);
-  const plotIntervalId = React.useRef(null);
+  const webcamRef = React.useRef<any>(null);
+  const intervalId = React.useRef<NodeJS.Timeout>();
+  const plotIntervalId = React.useRef<NodeJS.Timeout>();
   const [isRecording, setRecording] = useState(false);
-  const [charData, setCharData] = useState({
+  const [charData, setCharData] = useState<GraphProps>({
     labels: [],
     data: []
   });
 
   useEffect(
     () => () => {
-      clearInterval(intervalId.current);
+      if (intervalId.current) {
+        clearInterval(intervalId.current);
+      }
     },
     [intervalId]
   );
@@ -67,8 +74,12 @@ const Home = () => {
       plotIntervalId.current = setInterval(plotGraph, 30);
       preprocessor.startProcess();
     } else {
-      clearInterval(intervalId.current);
-      clearInterval(plotIntervalId.current);
+      if (intervalId.current) {
+        clearInterval(intervalId.current);
+      }
+      if (plotIntervalId.current) {
+        clearInterval(plotIntervalId.current);
+      }
       preprocessor.stopProcess();
       tensorStore.reset();
       setCharData({ labels: [], data: [] });
@@ -77,7 +88,7 @@ const Home = () => {
   };
 
   const capture = React.useCallback(() => {
-    if (webcamRef) {
+    if (webcamRef.current !== null) {
       const imageSrc = webcamRef.current.getScreenshot();
       if (imageSrc === null) return;
       const img = new Image(36, 36);

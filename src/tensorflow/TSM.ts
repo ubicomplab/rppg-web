@@ -3,11 +3,7 @@ import { tidy, reshape, split, zeros, concat, layers } from '@tensorflow/tfjs';
 class TSM extends layers.Layer {
   static className = 'TSM';
 
-  computeOutputShape(inputShape) {
-    return inputShape;
-  }
-
-  call(inputs) {
+  call(inputs: any) {
     return tidy(() => {
       // Initialization
       let input = inputs[0];

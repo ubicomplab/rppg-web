@@ -1,28 +1,41 @@
 import { BATCHSIZE } from '../constant';
-class MovingAvgProcessor {
+export interface MovingAvgProcessorInteface {
+  addData(data: number): void;
+  getSum(): number;
+  getMovingAvg(): number;
+  reset(): void;
+}
+
+class MovingAvgProcessor implements MovingAvgProcessorInteface {
+  sum: number;
+
+  movingAvg: number;
+
+  dataSet: number[];
+
   constructor() {
     this.sum = 0;
-    this.MovingAvg = 0;
+    this.movingAvg = 0;
     this.dataSet = [];
   }
 
   reset = () => {
     this.sum = 0;
-    this.MovingAvg = 0;
+    this.movingAvg = 0;
     this.dataSet = [];
   };
 
   getSum = () => this.sum;
 
-  getMovingAvg = () => this.MovingAvg;
+  getMovingAvg = () => this.movingAvg;
 
-  addData = data => {
+  addData = (data: number) => {
     if (this.dataSet.length === BATCHSIZE) {
-      this.sum -= this.dataSet.shift();
+      this.sum -= this.dataSet.shift() || 0;
     }
     this.sum += data;
     this.dataSet.push(data);
-    this.MovingAvg = this.sum / this.dataSet.length;
+    this.movingAvg = this.sum / this.dataSet.length;
   };
 }
 

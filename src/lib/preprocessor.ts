@@ -9,23 +9,36 @@ import {
   moments,
   concat,
   cast,
-  mean, Rank, Tensor
+  mean,
+  Rank,
+  Tensor,
+  Tensor3D
 } from '@tensorflow/tfjs';
 import { BATCHSIZE } from '../constant';
+import { PosprocessorInteface } from './posprocessor';
+import { TensorStoreInterface } from './tensorStore';
 
 export interface PreprocessorInteface {
   startProcess(): void;
   stopProcess(): void;
 }
 class Preprocessor implements PreprocessorInteface {
-  tensorStore: any;
-  posprocessor: any;
-  previousFrame: any;
+  tensorStore: TensorStoreInterface;
+
+  posprocessor: PosprocessorInteface;
+
+  previousFrame: Tensor<Rank> | null;
+
   isProcessing: boolean;
+
   rawBatch: Tensor<Rank>;
+
   normalizedBatch: Tensor<Rank>;
 
-  constructor(tensorStore, posprocessor) {
+  constructor(
+    tensorStore: TensorStoreInterface,
+    posprocessor: PosprocessorInteface
+  ) {
     this.tensorStore = tensorStore;
     this.posprocessor = posprocessor;
     this.previousFrame = null;
@@ -36,12 +49,13 @@ class Preprocessor implements PreprocessorInteface {
   }
 
   reset = () => {
-    this.previousFrame = null;
-    this.isProcessing = false;
-
     dispose(this.rawBatch);
     dispose(this.normalizedBatch);
-    dispose(this.previousFrame);
+    if (this.previousFrame) {
+      dispose(this.previousFrame);
+    }
+    this.previousFrame = null;
+    this.isProcessing = false;
     this.rawBatch = tensor([]);
     this.normalizedBatch = tensor([]);
   };
@@ -73,7 +87,7 @@ class Preprocessor implements PreprocessorInteface {
     }
   };
 
-  compute = (previousFrame, currentFrame) => {
+  compute = (previousFrame: Tensor<Rank> | null, currentFrame: Tensor3D) => {
     const [frame, nNormalize, mNoramlize] = tidy(() => {
       const expandOrigV = currentFrame
         .asType('float32')
@@ -94,13 +108,13 @@ class Preprocessor implements PreprocessorInteface {
           expandOrigV,
           moments(tempMeanNormalize).variance.sqrt()
         );
-        dispose(this.previousFrame);
+        dispose(previousFrame);
         return [expandOrigV, normalizedFrame, meanNormalize];
       }
       return [expandOrigV];
     });
 
-    if (this.rawBatch.shape[0]) {
+    if (this.rawBatch.shape[0] && mNoramlize && nNormalize) {
       const tempRawBath = tidy(() => concat([this.rawBatch, mNoramlize]));
       dispose(this.rawBatch);
       this.rawBatch = tempRawBath;
@@ -110,7 +124,7 @@ class Preprocessor implements PreprocessorInteface {
       );
       dispose(this.normalizedBatch);
       this.normalizedBatch = tempNormalizedBatch;
-    } else if (nNormalize) {
+    } else if (nNormalize && mNoramlize) {
       const tempRawBath = tidy(() => cast(mNoramlize, 'float32'));
       dispose(this.rawBatch);
       this.rawBatch = tempRawBath;
