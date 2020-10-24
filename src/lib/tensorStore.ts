@@ -1,16 +1,18 @@
-import { dispose } from '@tensorflow/tfjs';
+import { dispose, Tensor3D, TypedArray } from '@tensorflow/tfjs';
 
 export interface TensorStoreInterface {
   reset(): void;
-  getRawTensor(): any;
-  getRppgPltData(): any;
-  addRppgPltData(data: any): void;
-  addRawTensor(data: any): void;
+  getRawTensor(): Tensor3D | null;
+  getRppgPltData(): number | null;
+  addRppgPltData(data: TypedArray): void;
+  addRawTensor(data: Tensor3D): void;
 }
 
-class TensorStore implements TensorStoreInterface{
-  rawFrames: any[];
-  rppgPltData: any[];
+class TensorStore implements TensorStoreInterface {
+  rawFrames: Tensor3D[];
+
+  rppgPltData: number[];
+
   initialWait: boolean;
 
   constructor() {
@@ -29,7 +31,7 @@ class TensorStore implements TensorStoreInterface{
 
   getRawTensor = () => {
     if (this.rawFrames) {
-      return this.rawFrames.shift();
+      return this.rawFrames.shift() || null;
     }
     return null;
   };
@@ -42,16 +44,16 @@ class TensorStore implements TensorStoreInterface{
       this.initialWait = false;
     }
     if (this.rppgPltData) {
-      return this.rppgPltData.shift();
+      return this.rppgPltData.shift() || null;
     }
     return null;
   };
 
-  addRppgPltData = data => {
+  addRppgPltData = (data: TypedArray) => {
     this.rppgPltData = [...this.rppgPltData, ...data];
   };
 
-  addRawTensor = tensor => {
+  addRawTensor = (tensor: Tensor3D) => {
     this.rawFrames.push(tensor);
   };
 }

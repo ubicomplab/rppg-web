@@ -1,26 +1,32 @@
+/* eslint-disable @typescript-eslint/no-var-requires */
 const fs = require('fs');
 const path = require('path');
 
 const prettierOptions = JSON.parse(
-  fs.readFileSync(path.resolve(__dirname, '.prettierrc'), 'utf8'),
+  fs.readFileSync(path.resolve(__dirname, '.prettierrc'), 'utf8')
 );
 
 module.exports = {
-  parser: 'babel-eslint',
-  extends: ['airbnb', 'prettier', 'prettier/react'],
-  plugins: ['prettier', 'react', 'react-hooks', 'jsx-a11y'],
+  parser: '@typescript-eslint/parser', // Specifies the ESLint parser
+  extends: [
+    'airbnb',
+    'plugin:react/recommended',
+    'plugin:@typescript-eslint/recommended',
+    'prettier/@typescript-eslint',
+    'plugin:prettier/recommended'
+  ],
+  plugins: [
+    'prettier',
+    'react',
+    'react-hooks',
+    'jsx-a11y',
+    '@typescript-eslint'
+  ],
   env: {
     jest: true,
     browser: true,
     node: true,
-    es6: true,
-  },
-  parserOptions: {
-    ecmaVersion: 6,
-    sourceType: 'module',
-    ecmaFeatures: {
-      jsx: true,
-    },
+    es6: true
   },
   rules: {
     'prettier/prettier': ['error', prettierOptions],
@@ -38,8 +44,8 @@ module.exports = {
       2,
       2,
       {
-        SwitchCase: 1,
-      },
+        SwitchCase: 1
+      }
     ],
     'jsx-a11y/aria-props': 2,
     'jsx-a11y/heading-has-content': 0,
@@ -49,8 +55,8 @@ module.exports = {
         // NOTE: If this error triggers, either disable it or add
         // your custom components, labels and attributes via these options
         // See https://github.com/evcohen/eslint-plugin-jsx-a11y/blob/master/docs/rules/label-has-associated-control.md
-        controlComponents: ['Input'],
-      },
+        controlComponents: ['Input']
+      }
     ],
     'jsx-a11y/label-has-for': 0,
     'jsx-a11y/mouse-events-have-key-events': 2,
@@ -76,12 +82,27 @@ module.exports = {
     'react/self-closing-comp': 0,
     'react/sort-comp': 0,
     'require-yield': 0,
+    'react/jsx-props-no-spreading': 0,
+    '@typescript-eslint/explicit-module-boundary-types': 0,
+    'import/extensions': [
+      'error',
+      'ignorePackages',
+      {
+        js: 'never',
+        jsx: 'never',
+        ts: 'never',
+        tsx: 'never'
+      }
+    ]
   },
   settings: {
-    'import/resolver': {
-      webpack: {
-        config: './internals/webpack/webpack.prod.babel.js',
-      },
+    react: {
+      version: 'detect'
     },
-  },
+    'import/resolver': {
+      node: {
+        extensions: ['.js', '.jsx', '.ts', '.tsx']
+      }
+    }
+  }
 };

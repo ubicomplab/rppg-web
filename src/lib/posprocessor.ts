@@ -1,26 +1,47 @@
-import { serialization, loadLayersModel, cumsum } from '@tensorflow/tfjs';
-import CumsumProcessor from './moveAvgProcessor';
+import {
+  serialization,
+  loadLayersModel,
+  cumsum,
+  LayersModel,
+  Tensor,
+  Rank
+} from '@tensorflow/tfjs';
+import MovingAvgProcessor, {
+  MovingAvgProcessorInteface
+} from './moveAvgProcessor';
 import TSM from '../tensorflow/TSM';
 import AttentionMask from '../tensorflow/AttentionMask';
 import { BATCHSIZE } from '../constant';
+import { TensorStoreInterface } from './tensorStore';
 
 const path = 'model.json';
 
-class Posprocessor {
-  constructor(tensorStore) {
+export interface PosprocessorInteface {
+  compute(normalizedBatch: Tensor<Rank>, rawBatch: Tensor<Rank>): void;
+}
+
+class Posprocessor implements PosprocessorInteface {
+  tensorStore: TensorStoreInterface;
+
+  rppgAvgProcessor: MovingAvgProcessorInteface;
+
+  respAvgProcessor: MovingAvgProcessor;
+
+  model: LayersModel | null;
+
+  constructor(tensorStore: TensorStoreInterface) {
     this.tensorStore = tensorStore;
-    this.rppgData = new CumsumProcessor();
-    this.respData = new CumsumProcessor();
+    this.rppgAvgProcessor = new MovingAvgProcessor();
+    this.respAvgProcessor = new MovingAvgProcessor();
     this.model = null;
   }
 
   reset = () => {
-    this.rppgData = new CumsumProcessor();
-    this.respData = new CumsumProcessor();
+    this.rppgAvgProcessor.reset();
+    this.respAvgProcessor.reset();
   };
 
   loadModel = async () => {
-    this.isProcessing = true;
     if (this.model === null) {
       serialization.registerClass(TSM);
       serialization.registerClass(AttentionMask);
@@ -30,10 +51,12 @@ class Posprocessor {
     return true;
   };
 
-  compute = (normalizedBatch, rawBatch) => {
-    const [rppg, resp] = this.model.predict([normalizedBatch, rawBatch]);
-    const rppgCumsum = cumsum(rppg).dataSync();
-    this.tensorStore.addRppgPltData(rppgCumsum);
+  compute = (normalizedBatch: Tensor<Rank>, rawBatch: Tensor<Rank>) => {
+    if (this.model) {
+      const [rppg, resp] = this.model.predict([normalizedBatch, rawBatch]);
+      const rppgCumsum = cumsum(rppg).dataSync();
+      this.tensorStore.addRppgPltData(rppgCumsum);
+    }
     // const respCumsum = cumsum(resp).dataSync();
     // for (let i = 0; i < BATCHSIZE; i += 1) {
     //   this.rppgData.addData(rppgCumsum[i]);
