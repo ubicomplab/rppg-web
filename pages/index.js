@@ -63,7 +63,7 @@ const Home = () => {
   const handleRecording = () => {
     if (!isRecording) {
       intervalId.current = setInterval(capture, 30);
-      plotIntervalId.current = setInterval(plotGraph, 100);
+      plotIntervalId.current = setInterval(plotGraph, 30);
       preprocessor.startProcess();
       postprocessor.startProcess();
     } else {
@@ -72,6 +72,7 @@ const Home = () => {
       preprocessor.stopProcess();
       postprocessor.stopProcess();
       tensorStore.reset();
+      setCharData({ labels: [], data: [] });
     }
     setRecording(!isRecording);
   };
