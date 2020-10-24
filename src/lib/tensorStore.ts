@@ -1,5 +1,18 @@
 import { dispose } from '@tensorflow/tfjs';
-class TensorStore {
+
+export interface TensorStoreInterface {
+  reset(): void;
+  getRawTensor(): any;
+  getRppgPltData(): any;
+  addRppgPltData(data: any): void;
+  addRawTensor(data: any): void;
+}
+
+class TensorStore implements TensorStoreInterface{
+  rawFrames: any[];
+  rppgPltData: any[];
+  initialWait: boolean;
+
   constructor() {
     this.rawFrames = [];
     this.rppgPltData = [];
@@ -11,7 +24,6 @@ class TensorStore {
       dispose(f);
     });
     this.rawFrames = [];
-    this.processedFrames = [];
     this.rppgPltData = [];
   };
 

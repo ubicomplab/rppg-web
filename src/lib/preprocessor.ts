@@ -9,11 +9,22 @@ import {
   moments,
   concat,
   cast,
-  mean
+  mean, Rank, Tensor
 } from '@tensorflow/tfjs';
 import { BATCHSIZE } from '../constant';
 
-class Preprocessor {
+export interface PreprocessorInteface {
+  startProcess(): void;
+  stopProcess(): void;
+}
+class Preprocessor implements PreprocessorInteface {
+  tensorStore: any;
+  posprocessor: any;
+  previousFrame: any;
+  isProcessing: boolean;
+  rawBatch: Tensor<Rank>;
+  normalizedBatch: Tensor<Rank>;
+
   constructor(tensorStore, posprocessor) {
     this.tensorStore = tensorStore;
     this.posprocessor = posprocessor;
