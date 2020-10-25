@@ -55,9 +55,10 @@ class Posprocessor implements PosprocessorInteface {
     if (this.model) {
       const [rppg, resp] = this.model.predict([normalizedBatch, rawBatch]);
       const rppgCumsum = cumsum(rppg).dataSync();
+      const respCumsum = cumsum(resp).dataSync();
       this.tensorStore.addRppgPltData(rppgCumsum);
+      this.tensorStore.addRespPltData(respCumsum);
     }
-    // const respCumsum = cumsum(resp).dataSync();
     // for (let i = 0; i < BATCHSIZE; i += 1) {
     //   this.rppgData.addData(rppgCumsum[i]);
     //   this.respData.addData(respCumsum[i]);
