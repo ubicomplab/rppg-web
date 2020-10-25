@@ -17,8 +17,6 @@ const config = {
   label: 'My First dataset',
   fill: false,
   lineTension: 0.1,
-  backgroundColor: 'rgba(75,192,192,0.4)',
-  borderColor: 'rgba(75,192,192,1)',
   borderCapStyle: 'butt',
   borderDash: [],
   borderDashOffset: 0.0,
@@ -36,7 +34,8 @@ const config = {
 
 type GraphProps = {
   labels: string[];
-  data: number[];
+  rppg: number[];
+  resp: number[];
 };
 
 const Home = () => {
@@ -46,7 +45,8 @@ const Home = () => {
   const [isRecording, setRecording] = useState(false);
   const [charData, setCharData] = useState<GraphProps>({
     labels: [],
-    data: []
+    rppg: [],
+    resp: []
   });
 
   useEffect(
@@ -82,7 +82,7 @@ const Home = () => {
       }
       preprocessor.stopProcess();
       tensorStore.reset();
-      setCharData({ labels: [], data: [] });
+      setCharData({ labels: [], resp: [], rppg: [] });
     }
     setRecording(!isRecording);
   };
@@ -101,8 +101,9 @@ const Home = () => {
   }, [webcamRef]);
 
   const plotGraph = () => {
-    const dataPoint = tensorStore.getRppgPltData();
-    if (dataPoint) {
+    const pltData = tensorStore.getPltData();
+    if (pltData) {
+      const [rppg, resp] = pltData;
       const now = new Date();
       const newLabels =
         charData.labels.length >= 60
@@ -112,13 +113,17 @@ const Home = () => {
         `${now.getHours()}:${now.getMinutes()}:${now.getSeconds()}:${now.getMilliseconds()}`
       );
 
-      const newData =
-        charData.data.length >= 60 ? charData.data.slice(1) : charData.data;
-      newData.push(dataPoint);
+      const newRppg =
+        charData.rppg.length >= 60 ? charData.rppg.slice(1) : charData.rppg;
+      newRppg.push(rppg);
 
+      const newResp =
+        charData.resp.length >= 60 ? charData.resp.slice(1) : charData.resp;
+      newResp.push(resp);
       setCharData({
         labels: newLabels,
-        data: newData
+        rppg: newRppg,
+        resp: newResp
       });
     }
   };
@@ -128,7 +133,15 @@ const Home = () => {
     datasets: [
       {
         ...config,
-        data: charData.data
+        label: 'rppg',
+        borderColor: 'red',
+        data: charData.rppg
+      },
+      {
+        ...config,
+        label: 'resp',
+        borderColor: 'green',
+        data: charData.resp
       }
     ]
   };
