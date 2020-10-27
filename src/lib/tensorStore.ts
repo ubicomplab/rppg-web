@@ -63,7 +63,7 @@ class TensorStore implements TensorStoreInterface {
   };
 
   addRespPltData = (data: TypedArray) => {
-    this.respPltData = [...this.rppgPltData, ...data];
+    this.respPltData = [...this.respPltData, ...data];
   };
 
   addRawTensor = (tensor: Tensor3D) => {
