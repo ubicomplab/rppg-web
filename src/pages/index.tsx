@@ -136,13 +136,13 @@ const Home = () => {
         label: 'rppg',
         borderColor: 'red',
         data: charData.rppg
-      },
-      {
-        ...config,
-        label: 'resp',
-        borderColor: 'green',
-        data: charData.resp
-      }
+      }//,
+      // {
+      //   ...config,
+      //   label: 'resp',
+      //   borderColor: 'green',
+      //   data: charData.resp
+      // }
     ]
   };
   return (
