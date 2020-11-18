@@ -3,6 +3,7 @@ import { Line } from 'react-chartjs-2';
 import Head from 'next/head';
 import Webcam from 'react-webcam';
 import { browser } from '@tensorflow/tfjs';
+import { ChartDataSets } from 'chart.js';
 import Header from '../components/header';
 import Research from '../components/research';
 import styles from '../styles/Home.module.scss';
@@ -13,14 +14,12 @@ import Posprocessor from '../lib/posprocessor';
 const postprocessor = new Posprocessor(tensorStore);
 const preprocessor = new Preprocessor(tensorStore, postprocessor);
 
-const config = {
+const config: ChartDataSets = {
   label: 'My First dataset',
   fill: false,
   lineTension: 0.1,
-  borderCapStyle: 'butt',
   borderDash: [],
   borderDashOffset: 0.0,
-  borderJoinStyle: 'miter',
   pointBorderColor: 'rgba(75,192,192,1)',
   pointBackgroundColor: '#fff',
   pointBorderWidth: 1,
@@ -136,7 +135,7 @@ const Home = () => {
         label: 'rppg',
         borderColor: 'red',
         data: charData.rppg
-      }//,
+      } // ,
       // {
       //   ...config,
       //   label: 'resp',
@@ -154,14 +153,6 @@ const Home = () => {
       <Header />
       <div className={styles.contentContainer}>
         <Research />
-        {isRecording && (
-          <Webcam
-            mirrored
-            audio={false}
-            ref={webcamRef}
-            screenshotFormat="image/jpeg"
-          />
-        )}
         <button
           className={styles.recordingButton}
           onClick={handleRecording}
@@ -169,14 +160,45 @@ const Home = () => {
         >
           {isRecording ? 'Stop Recording' : 'Start Recording'}
         </button>
-        <Line
-          data={plotData}
-          options={{
-            animation: {
-              duration: 0
-            }
-          }}
-        />
+        <div className={styles.innerContainer}>
+          {isRecording && (
+            <Webcam
+              width={200}
+              height={200}
+              mirrored
+              audio={false}
+              ref={webcamRef}
+              screenshotFormat="image/jpeg"
+            />
+          )}
+          <Line
+            data={plotData}
+            width={720}
+            height={500}
+            options={{
+              responsive: false,
+              animation: {
+                duration: 0
+              },
+              scales: {
+                yAxes: [
+                  {
+                    ticks: {
+                      display: false
+                    }
+                  }
+                ],
+                xAxes: [
+                  {
+                    ticks: {
+                      display: false
+                    }
+                  }
+                ]
+              }
+            }}
+          />
+        </div>
       </div>
     </>
   );
