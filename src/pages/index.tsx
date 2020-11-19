@@ -2,8 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { Line } from 'react-chartjs-2';
 import Head from 'next/head';
 import Webcam from 'react-webcam';
-import { browser } from '@tensorflow/tfjs';
 import { ChartDataSets } from 'chart.js';
+import { image, browser } from '@tensorflow/tfjs';
 import Header from '../components/header';
 import Research from '../components/research';
 import styles from '../styles/Home.module.scss';
@@ -90,10 +90,19 @@ const Home = () => {
     if (webcamRef.current !== null) {
       const imageSrc = webcamRef.current.getScreenshot();
       if (imageSrc === null) return;
-      const img = new Image(36, 36);
+      const img = new Image(480, 640);
+
       img.src = imageSrc;
       img.onload = () => {
-        const origV = browser.fromPixels(img);
+        const origVExpand: any = browser.fromPixels(img).expandDims(0);
+        const crop = image.cropAndResize(
+          origVExpand,
+          [[0.125, 0.21875, 0.875, 0.78125]],
+          [0],
+          [36, 36],
+          'bilinear'
+        );
+        const origV: any = crop.reshape([36, 36, 3]);
         tensorStore.addRawTensor(origV);
       };
     }
