@@ -15,7 +15,7 @@ const postprocessor = new Posprocessor(tensorStore);
 const preprocessor = new Preprocessor(tensorStore, postprocessor);
 
 const config: ChartDataSets = {
-  label: 'My First dataset',
+  label: 'Graph',
   fill: false,
   lineTension: 0.1,
   borderDash: [],
@@ -105,7 +105,7 @@ const Home = () => {
       const [rppg, resp] = pltData;
       const now = new Date();
       const newLabels =
-        charData.labels.length >= 60
+        charData.labels.length >= 180
           ? charData.labels.slice(1)
           : charData.labels;
       newLabels.push(
@@ -113,11 +113,11 @@ const Home = () => {
       );
 
       const newRppg =
-        charData.rppg.length >= 60 ? charData.rppg.slice(1) : charData.rppg;
+        charData.rppg.length >= 180 ? charData.rppg.slice(1) : charData.rppg;
       newRppg.push(rppg);
 
       const newResp =
-        charData.resp.length >= 60 ? charData.resp.slice(1) : charData.resp;
+        charData.resp.length >= 180 ? charData.resp.slice(1) : charData.resp;
       newResp.push(resp);
       setCharData({
         labels: newLabels,
@@ -132,7 +132,7 @@ const Home = () => {
     datasets: [
       {
         ...config,
-        label: 'rppg',
+        label: 'Pulse',
         borderColor: 'red',
         data: charData.rppg
       } // ,
@@ -163,8 +163,8 @@ const Home = () => {
         <div className={styles.innerContainer}>
           {isRecording && (
             <Webcam
-              width={200}
-              height={200}
+              width={500}
+              height={500}
               mirrored
               audio={false}
               ref={webcamRef}
@@ -173,7 +173,7 @@ const Home = () => {
           )}
           <Line
             data={plotData}
-            width={720}
+            width={960}
             height={500}
             options={{
               responsive: false,
