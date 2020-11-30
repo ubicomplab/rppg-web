@@ -170,7 +170,8 @@ const Home = () => {
           {isRecording ? 'Stop Recording' : 'Start Recording'}
         </button>
         <div className={styles.innerContainer}>
-          {isRecording && (
+          {/* {isRecording && ( */}
+          <div className={styles.webcam}>
             <Webcam
               width={500}
               height={500}
@@ -179,7 +180,9 @@ const Home = () => {
               ref={webcamRef}
               screenshotFormat="image/jpeg"
             />
-          )}
+          </div>
+
+          {/* )} */}
           <Line
             data={plotData}
             width={960}
