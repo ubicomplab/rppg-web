@@ -3,7 +3,7 @@ import { Line } from 'react-chartjs-2';
 import Head from 'next/head';
 import Webcam from 'react-webcam';
 import { ChartDataSets } from 'chart.js';
-import { image, browser } from '@tensorflow/tfjs';
+import { image, browser, tidy, dispose } from '@tensorflow/tfjs';
 import Header from '../components/header';
 import Research from '../components/research';
 import styles from '../styles/Home.module.scss';
@@ -94,7 +94,9 @@ const Home = () => {
 
       img.src = imageSrc;
       img.onload = () => {
-        const origVExpand: any = browser.fromPixels(img).expandDims(0);
+        const origVExpand: any = tidy(() =>
+          browser.fromPixels(img).expandDims(0)
+        );
         const crop = image.cropAndResize(
           origVExpand,
           [[0.125, 0.21875, 0.875, 0.78125]],
@@ -102,6 +104,7 @@ const Home = () => {
           [36, 36],
           'bilinear'
         );
+        dispose(origVExpand);
         const origV: any = crop.reshape([36, 36, 3]);
         tensorStore.addRawTensor(origV);
       };
@@ -169,48 +172,47 @@ const Home = () => {
         >
           {isRecording ? 'Stop Recording' : 'Start Recording'}
         </button>
-        <div className={styles.innerContainer}>
-          {/* {isRecording && ( */}
-          <div className={styles.webcam}>
-            <Webcam
-              width={500}
+        {isRecording && (
+          <div className={styles.innerContainer}>
+            <div className={styles.webcam}>
+              <Webcam
+                width={500}
+                height={500}
+                mirrored
+                audio={false}
+                ref={webcamRef}
+                screenshotFormat="image/jpeg"
+              />
+            </div>
+            <Line
+              data={plotData}
+              width={960}
               height={500}
-              mirrored
-              audio={false}
-              ref={webcamRef}
-              screenshotFormat="image/jpeg"
+              options={{
+                responsive: false,
+                animation: {
+                  duration: 0
+                },
+                scales: {
+                  yAxes: [
+                    {
+                      ticks: {
+                        display: false
+                      }
+                    }
+                  ],
+                  xAxes: [
+                    {
+                      ticks: {
+                        display: false
+                      }
+                    }
+                  ]
+                }
+              }}
             />
           </div>
-
-          {/* )} */}
-          <Line
-            data={plotData}
-            width={960}
-            height={500}
-            options={{
-              responsive: false,
-              animation: {
-                duration: 0
-              },
-              scales: {
-                yAxes: [
-                  {
-                    ticks: {
-                      display: false
-                    }
-                  }
-                ],
-                xAxes: [
-                  {
-                    ticks: {
-                      display: false
-                    }
-                  }
-                ]
-              }
-            }}
-          />
-        </div>
+        )}
       </div>
     </>
   );
