@@ -90,7 +90,7 @@ const Home = () => {
         );
         const crop = image.cropAndResize(
           origVExpand,
-          [[0.125, 0.21875, 0.875, 0.78125]],
+          [[0.1, 0.3, 0.56, 0.7]],
           [0],
           [36, 36],
           'bilinear'
