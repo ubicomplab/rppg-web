@@ -11,13 +11,13 @@ const Research = () => (
         Vitals Measurement
       </p>
     </b>
-    <a href="https://homes.cs.washington.edu/~xliu0/">Xin Liu</a>
-    <a href="https://www.jwfromm.com/">Josh Fromm</a>
-    <a href="https://homes.cs.washington.edu/~shwetak/">Shwetak Patel</a>
+    <a href="https://homes.cs.washington.edu/~xliu0/">Xin Liu, </a>
+    <a href="https://www.jwfromm.com/">Josh Fromm, </a>
+    <a href="https://homes.cs.washington.edu/~shwetak/">Shwetak Patel, </a>
     <a href="https://www.microsoft.com/en-us/research/people/damcduff/">
-      Daniel McDuff
+     Daniel McDuff
     </a>
-    <a href="NIPS2020_MTTS_CAN_preprint.pdf">
+    <a href="https://ubicomplab.cs.washington.edu/pdfs/mtts_can.pdf">
       <h3>Download PDF</h3>
     </a>
   </div>
