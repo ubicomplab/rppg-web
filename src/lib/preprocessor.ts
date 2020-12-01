@@ -92,7 +92,8 @@ class Preprocessor implements PreprocessorInteface {
       const expandOrigV = currentFrame
         .asType('float32')
         .div(scalar(255))
-        .clipByValue(1/255, 1).expandDims(0);
+        .clipByValue(1 / 255, 1)
+        .expandDims(0);
       if (previousFrame) {
         const tempNormalizedFrame = div(
           sub(expandOrigV, previousFrame),
