@@ -106,7 +106,7 @@ class Preprocessor implements PreprocessorInteface {
 
         const tempMeanNormalize = sub(expandOrigV, mean(expandOrigV));
         const meanNormalize = div(
-          expandOrigV,
+          tempMeanNormalize,
           moments(tempMeanNormalize).variance.sqrt()
         );
         dispose(previousFrame);
