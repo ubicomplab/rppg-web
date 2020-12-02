@@ -108,7 +108,7 @@ const Home = () => {
       const [rppg, resp] = pltData;
       const now = new Date();
       const newLabels =
-        charData.labels.length >= 180
+        charData.labels.length >= 360
           ? charData.labels.slice(1)
           : charData.labels;
       newLabels.push(
@@ -116,11 +116,11 @@ const Home = () => {
       );
 
       const newRppg =
-        charData.rppg.length >= 180 ? charData.rppg.slice(1) : charData.rppg;
+        charData.rppg.length >= 360 ? charData.rppg.slice(1) : charData.rppg;
       newRppg.push(rppg);
 
       const newResp =
-        charData.resp.length >= 180 ? charData.resp.slice(1) : charData.resp;
+        charData.resp.length >= 360 ? charData.resp.slice(1) : charData.resp;
       newResp.push(resp);
       setCharData({
         labels: newLabels,
@@ -177,8 +177,8 @@ const Home = () => {
             </div>
             <Line
               data={plotData}
-              width={960}
-              height={500}
+              width={1200}
+              height={300}
               options={{
                 responsive: false,
                 animation: {
@@ -188,6 +188,8 @@ const Home = () => {
                   yAxes: [
                     {
                       ticks: {
+                        suggestedMin: -5,
+                        suggestedMax: 5,
                         display: false
                       }
                     }

@@ -4,6 +4,8 @@ import {
   cumsum,
   LayersModel,
   Tensor,
+  mean,
+  sub,
   Rank
 } from '@tensorflow/tfjs';
 import MovingAvgProcessor, {
@@ -57,12 +59,9 @@ class Posprocessor implements PosprocessorInteface {
         Rank
       >;
       const rppgCumsum = cumsum(rppg)
-        .dataSync()
-        .map((i: number) => {
-          this.rppgAvgProcessor.addData(i);
-          return this.rppgAvgProcessor.getMovingAvg();
-        });
-      this.tensorStore.addRppgPltData(rppgCumsum);
+      const rppg_detrended = sub(rppgCumsum, mean(rppgCumsum)).dataSync();
+      // const filerted_data = sub(rppg_detrended, mean(rppg_detrended)).dataSync();
+      this.tensorStore.addRppgPltData(rppg_detrended);
     }
   };
 }
