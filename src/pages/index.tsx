@@ -147,6 +147,19 @@ const Home = () => {
       // }
     ]
   };
+
+  const downloadToFile = () => {
+    const a = document.createElement('a');
+    const data = JSON.stringify(tensorStore.dumpData);
+    const file = new Blob([data], { type: 'file' });
+
+    a.href = URL.createObjectURL(file);
+    a.download = 'result.json';
+    a.click();
+
+    URL.revokeObjectURL(a.href);
+  };
+
   return (
     <>
       <Head>
@@ -156,6 +169,13 @@ const Home = () => {
       <Header />
       <div className={styles.contentContainer}>
         <Research />
+        <button
+          className={styles.recordingButton}
+          onClick={downloadToFile}
+          type="button"
+        >
+          Dump
+        </button>
         <button
           className={styles.recordingButton}
           onClick={handleRecording}
