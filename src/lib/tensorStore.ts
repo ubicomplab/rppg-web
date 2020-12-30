@@ -16,12 +16,15 @@ class TensorStore implements TensorStoreInterface {
 
   respPltData: number[];
 
+  dumpData: number[][];
+
   initialWait: boolean;
 
   constructor() {
     this.rawFrames = [];
     this.rppgPltData = [];
     this.respPltData = [];
+    this.dumpData = [];
     this.initialWait = true;
   }
 
@@ -36,7 +39,11 @@ class TensorStore implements TensorStoreInterface {
 
   getRawTensor = () => {
     if (this.rawFrames) {
-      return this.rawFrames.shift() || null;
+      const tensor = this.rawFrames.shift() || null;
+      if (tensor) {
+        this.dumpData.push(Array.from(tensor.dataSync()));
+      }
+      return tensor;
     }
     return null;
   };
