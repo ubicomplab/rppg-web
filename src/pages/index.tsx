@@ -154,7 +154,7 @@ const Home = () => {
     const file = new Blob([data], { type: 'file' });
 
     a.href = URL.createObjectURL(file);
-    a.download = 'result.json';
+    a.download = 'resizing.json';
     a.click();
 
     URL.revokeObjectURL(a.href);
@@ -166,7 +166,7 @@ const Home = () => {
     const file = new Blob([data], { type: 'file' });
 
     a.href = URL.createObjectURL(file);
-    a.download = 'pre_normalized.json';
+    a.download = 'model_input_normalized.json';
     a.click();
 
     URL.revokeObjectURL(a.href);
@@ -178,7 +178,31 @@ const Home = () => {
     const file = new Blob([data], { type: 'file' });
 
     a.href = URL.createObjectURL(file);
-    a.download = 'pre_raw.json';
+    a.download = 'model_input_raw.json';
+    a.click();
+
+    URL.revokeObjectURL(a.href);
+  };
+
+  const downloadPredToFile = () => {
+    const a = document.createElement('a');
+    const data = JSON.stringify(tensorStore.dumpPred);
+    const file = new Blob([data], { type: 'file' });
+
+    a.href = URL.createObjectURL(file);
+    a.download = 'pred.json';
+    a.click();
+
+    URL.revokeObjectURL(a.href);
+  };
+
+  const downloadPredCumsumToFile = () => {
+    const a = document.createElement('a');
+    const data = JSON.stringify(tensorStore.dumpPredCumsum);
+    const file = new Blob([data], { type: 'file' });
+
+    a.href = URL.createObjectURL(file);
+    a.download = 'predCumsum.json';
     a.click();
 
     URL.revokeObjectURL(a.href);
@@ -198,21 +222,35 @@ const Home = () => {
           onClick={downloadToFile}
           type="button"
         >
-          Dump
+          Dump Resizing
         </button>
         <button
           className={styles.recordingButton}
           onClick={downloadNormalizedToFile}
           type="button"
         >
-          Dump normalized
+          Dump Normalized Model Input
         </button>
         <button
           className={styles.recordingButton}
           onClick={downloadRawToFile}
           type="button"
         >
-          Dump rawbatch
+          Dump Raw Model Input
+        </button>
+        <button
+          className={styles.recordingButton}
+          onClick={downloadPredToFile}
+          type="button"
+        >
+          Dump Predictions
+        </button>
+        <button
+          className={styles.recordingButton}
+          onClick={downloadPredToFile}
+          type="button"
+        >
+          Dump Predictions After Cumsum
         </button>
         <button
           className={styles.recordingButton}

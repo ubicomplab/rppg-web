@@ -55,6 +55,10 @@ class Posprocessor implements PosprocessorInteface {
 
   compute = (normalizedBatch: Tensor<Rank>, rawBatch: Tensor<Rank>) => {
     if (this.model) {
+      this.tensorStore.addDebugData(
+        Array.from(normalizedBatch.dataSync()),
+        Array.from(rawBatch.dataSync())
+      );
       const rppg = this.model.predict([normalizedBatch, rawBatch]) as Tensor<
         Rank
       >;
@@ -62,6 +66,10 @@ class Posprocessor implements PosprocessorInteface {
       // const rppg_detrended = sub(rppgCumsum, mean(rppgCumsum)).dataSync();
       // const filerted_data = sub(rppg_detrended, mean(rppg_detrended)).dataSync();
       this.tensorStore.addRppgPltData(rppgCumsum.dataSync());
+      this.tensorStore.addDebugPredData(
+        Array.from(rppg.dataSync()),
+        Array.from(rppgCumsum.dataSync())
+      );
     }
   };
 }
