@@ -160,6 +160,30 @@ const Home = () => {
     URL.revokeObjectURL(a.href);
   };
 
+  const downloadNormalizedToFile = () => {
+    const a = document.createElement('a');
+    const data = JSON.stringify(tensorStore.dumpNormalizedData);
+    const file = new Blob([data], { type: 'file' });
+
+    a.href = URL.createObjectURL(file);
+    a.download = 'pre_normalized.json';
+    a.click();
+
+    URL.revokeObjectURL(a.href);
+  };
+
+  const downloadRawToFile = () => {
+    const a = document.createElement('a');
+    const data = JSON.stringify(tensorStore.dumpRawData);
+    const file = new Blob([data], { type: 'file' });
+
+    a.href = URL.createObjectURL(file);
+    a.download = 'pre_raw.json';
+    a.click();
+
+    URL.revokeObjectURL(a.href);
+  };
+
   return (
     <>
       <Head>
@@ -175,6 +199,20 @@ const Home = () => {
           type="button"
         >
           Dump
+        </button>
+        <button
+          className={styles.recordingButton}
+          onClick={downloadNormalizedToFile}
+          type="button"
+        >
+          Dump normalized
+        </button>
+        <button
+          className={styles.recordingButton}
+          onClick={downloadRawToFile}
+          type="button"
+        >
+          Dump rawbatch
         </button>
         <button
           className={styles.recordingButton}
