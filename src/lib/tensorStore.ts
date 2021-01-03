@@ -8,6 +8,7 @@ export interface TensorStoreInterface {
   addRespPltData(data: TypedArray): void;
   addRawTensor(data: Tensor3D): void;
   addDebugData(normalizedBatch: number[], rawBatch: number[]): void;
+  addDebugPredData(predBatch: number[], predCumsumBatch: number[]): void;
 }
 
 class TensorStore implements TensorStoreInterface {
@@ -23,6 +24,10 @@ class TensorStore implements TensorStoreInterface {
 
   dumpRawData: number[][];
 
+  dumpPred: number[][];
+
+  dumpPredCumsum: number[][];
+
   initialWait: boolean;
 
   constructor() {
@@ -32,6 +37,8 @@ class TensorStore implements TensorStoreInterface {
     this.dumpData = [];
     this.dumpNormalizedData = [];
     this.dumpRawData = [];
+    this.dumpPred = [];
+    this.dumpPredCumsum = [];
     this.initialWait = true;
   }
 
@@ -88,6 +95,12 @@ class TensorStore implements TensorStoreInterface {
     this.dumpNormalizedData.push(normalizedBatch);
     this.dumpRawData.push(rawBatch);
   };
+
+  addDebugPredData = (predBatch: number[], predCumsumBatch: number[]) => {
+    this.dumpPred.push(predBatch);
+    this.dumpPredCumsum.push(predCumsumBatch);
+  };
+
 }
 
 export default new TensorStore();

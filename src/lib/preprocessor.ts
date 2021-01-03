@@ -135,10 +135,6 @@ class Preprocessor implements PreprocessorInteface {
       this.normalizedBatch = tempNormalized;
     }
     if (this.rawBatch.shape[0] === BATCHSIZE) {
-      this.tensorStore.addDebugData(
-        Array.from(this.normalizedBatch.dataSync()),
-        Array.from(this.rawBatch.dataSync())
-      );
       this.posprocessor.compute(this.normalizedBatch, this.rawBatch);
       dispose(this.rawBatch);
       dispose(this.normalizedBatch);
