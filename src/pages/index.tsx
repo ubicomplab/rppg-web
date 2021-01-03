@@ -247,7 +247,7 @@ const Home = () => {
         </button>
         <button
           className={styles.recordingButton}
-          onClick={downloadPredToFile}
+          onClick={downloadPredCumsumToFile}
           type="button"
         >
           Dump Predictions After Cumsum
