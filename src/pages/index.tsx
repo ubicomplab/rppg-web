@@ -32,6 +32,7 @@ const Home = () => {
   const webcamRef = React.useRef<any>(null);
   const intervalId = React.useRef<NodeJS.Timeout>();
   const plotIntervalId = React.useRef<NodeJS.Timeout>();
+  const coutdownIntervalId = React.useRef<NodeJS.Timeout>();
   const [isRecording, setRecording] = useState(false);
   const [charData, setCharData] = useState<GraphProps>({
     labels: [],
@@ -39,10 +40,22 @@ const Home = () => {
     resp: []
   });
 
+  const [countDown, setCondown] = useState(30);
+
+  useEffect(() => {
+    coutdownIntervalId.current = setInterval(() => {
+      setCondown(prevCount => prevCount - 1);
+    }, 1000);
+  }, []);
+
   useEffect(
     () => () => {
       if (intervalId.current) {
         clearInterval(intervalId.current);
+      }
+
+      if (coutdownIntervalId.current) {
+        clearInterval(coutdownIntervalId.current);
       }
     },
     [intervalId]
@@ -217,6 +230,7 @@ const Home = () => {
       <Header />
       <div className={styles.contentContainer}>
         <Research />
+        <p>{countDown}</p>
         <button
           className={styles.recordingButton}
           onClick={downloadToFile}
