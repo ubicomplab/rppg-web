@@ -25,28 +25,19 @@ const config: ChartDataSets = {
 type GraphProps = {
   labels: string[];
   rppg: number[];
-  resp: number[];
 };
 
 const Home = () => {
   const webcamRef = React.useRef<any>(null);
   const intervalId = React.useRef<NodeJS.Timeout>();
-  const plotIntervalId = React.useRef<NodeJS.Timeout>();
   const coutdownIntervalId = React.useRef<NodeJS.Timeout>();
   const [isRecording, setRecording] = useState(false);
   const [charData, setCharData] = useState<GraphProps>({
     labels: [],
-    rppg: [],
-    resp: []
+    rppg: []
   });
-
+  const refCountDown = React.useRef(30);
   const [countDown, setCondown] = useState(30);
-
-  useEffect(() => {
-    coutdownIntervalId.current = setInterval(() => {
-      setCondown(prevCount => prevCount - 1);
-    }, 1000);
-  }, []);
 
   useEffect(
     () => () => {
@@ -70,24 +61,31 @@ const Home = () => {
     []
   );
 
-  const handleRecording = async () => {
-    if (!isRecording) {
-      await postprocessor.loadModel();
-      intervalId.current = setInterval(capture, 30);
-      plotIntervalId.current = setInterval(plotGraph, 30);
-      preprocessor.startProcess();
-    } else {
-      if (intervalId.current) {
-        clearInterval(intervalId.current);
+  const startRecording = async () => {
+    await postprocessor.loadModel();
+    intervalId.current = setInterval(capture, 30);
+    coutdownIntervalId.current = setInterval(() => {
+      setCondown(prevCount => prevCount - 1);
+      refCountDown.current -= 1;
+      if (refCountDown.current === 0) {
+        plotGraph();
+        stopRecording();
       }
-      if (plotIntervalId.current) {
-        clearInterval(plotIntervalId.current);
-      }
-      preprocessor.stopProcess();
-      tensorStore.reset();
-      setCharData({ labels: [], resp: [], rppg: [] });
+    }, 1000);
+    setRecording(true);
+    preprocessor.startProcess();
+  };
+
+  const stopRecording = () => {
+    if (intervalId.current) {
+      clearInterval(intervalId.current);
     }
-    setRecording(!isRecording);
+    if (coutdownIntervalId.current) {
+      clearInterval(coutdownIntervalId.current);
+    }
+    preprocessor.stopProcess();
+    tensorStore.reset();
+    setRecording(false);
   };
 
   const capture = React.useCallback(() => {
@@ -116,29 +114,12 @@ const Home = () => {
   }, [webcamRef]);
 
   const plotGraph = () => {
-    const pltData = tensorStore.getPltData();
+    const pltData = tensorStore.rppgPltData;
     if (pltData) {
-      const [rppg, resp] = pltData;
-      const now = new Date();
-      const newLabels =
-        charData.labels.length >= 360
-          ? charData.labels.slice(1)
-          : charData.labels;
-      newLabels.push(
-        `${now.getHours()}:${now.getMinutes()}:${now.getSeconds()}:${now.getMilliseconds()}`
-      );
-
-      const newRppg =
-        charData.rppg.length >= 360 ? charData.rppg.slice(1) : charData.rppg;
-      newRppg.push(rppg);
-
-      const newResp =
-        charData.resp.length >= 360 ? charData.resp.slice(1) : charData.resp;
-      newResp.push(resp);
+      const labels = Array.from(pltData.keys()).map(i => i.toString());
       setCharData({
-        labels: newLabels,
-        rppg: newRppg,
-        resp: newResp
+        labels,
+        rppg: pltData
       });
     }
   };
@@ -151,74 +132,8 @@ const Home = () => {
         label: 'Pulse',
         borderColor: 'red',
         data: charData.rppg
-      } // ,
-      // {
-      //   ...config,
-      //   label: 'resp',
-      //   borderColor: 'green',
-      //   data: charData.resp
-      // }
+      }
     ]
-  };
-
-  const downloadToFile = () => {
-    const a = document.createElement('a');
-    const data = JSON.stringify(tensorStore.dumpData);
-    const file = new Blob([data], { type: 'file' });
-
-    a.href = URL.createObjectURL(file);
-    a.download = 'resizing.json';
-    a.click();
-
-    URL.revokeObjectURL(a.href);
-  };
-
-  const downloadNormalizedToFile = () => {
-    const a = document.createElement('a');
-    const data = JSON.stringify(tensorStore.dumpNormalizedData);
-    const file = new Blob([data], { type: 'file' });
-
-    a.href = URL.createObjectURL(file);
-    a.download = 'model_input_normalized.json';
-    a.click();
-
-    URL.revokeObjectURL(a.href);
-  };
-
-  const downloadRawToFile = () => {
-    const a = document.createElement('a');
-    const data = JSON.stringify(tensorStore.dumpRawData);
-    const file = new Blob([data], { type: 'file' });
-
-    a.href = URL.createObjectURL(file);
-    a.download = 'model_input_raw.json';
-    a.click();
-
-    URL.revokeObjectURL(a.href);
-  };
-
-  const downloadPredToFile = () => {
-    const a = document.createElement('a');
-    const data = JSON.stringify(tensorStore.dumpPred);
-    const file = new Blob([data], { type: 'file' });
-
-    a.href = URL.createObjectURL(file);
-    a.download = 'pred.json';
-    a.click();
-
-    URL.revokeObjectURL(a.href);
-  };
-
-  const downloadPredCumsumToFile = () => {
-    const a = document.createElement('a');
-    const data = JSON.stringify(tensorStore.dumpPredCumsum);
-    const file = new Blob([data], { type: 'file' });
-
-    a.href = URL.createObjectURL(file);
-    a.download = 'predCumsum.json';
-    a.click();
-
-    URL.revokeObjectURL(a.href);
   };
 
   return (
@@ -231,60 +146,27 @@ const Home = () => {
       <div className={styles.contentContainer}>
         <Research />
         <p>{countDown}</p>
-        <button
-          className={styles.recordingButton}
-          onClick={downloadToFile}
-          type="button"
-        >
-          Dump Resizing
-        </button>
-        <button
-          className={styles.recordingButton}
-          onClick={downloadNormalizedToFile}
-          type="button"
-        >
-          Dump Normalized Model Input
-        </button>
-        <button
-          className={styles.recordingButton}
-          onClick={downloadRawToFile}
-          type="button"
-        >
-          Dump Raw Model Input
-        </button>
-        <button
-          className={styles.recordingButton}
-          onClick={downloadPredToFile}
-          type="button"
-        >
-          Dump Predictions
-        </button>
-        <button
-          className={styles.recordingButton}
-          onClick={downloadPredCumsumToFile}
-          type="button"
-        >
-          Dump Predictions After Cumsum
-        </button>
-        <button
-          className={styles.recordingButton}
-          onClick={handleRecording}
-          type="button"
-        >
-          {isRecording ? 'Stop Recording' : 'Start Recording'}
-        </button>
-        {isRecording && (
-          <div className={styles.innerContainer}>
-            <div className={styles.webcam}>
-              <Webcam
-                width={500}
-                height={500}
-                mirrored
-                audio={false}
-                ref={webcamRef}
-                screenshotFormat="image/jpeg"
-              />
-            </div>
+        {!isRecording && (
+          <button
+            className={styles.recordingButton}
+            onClick={startRecording}
+            type="button"
+          >
+            Start Recording
+          </button>
+        )}
+        <div className={styles.innerContainer}>
+          <div className={styles.webcam}>
+            <Webcam
+              width={500}
+              height={500}
+              mirrored
+              audio={false}
+              ref={webcamRef}
+              screenshotFormat="image/jpeg"
+            />
+          </div>
+          {!isRecording && !!charData.rppg.length && (
             <Line
               data={plotData}
               width={1200}
@@ -314,8 +196,8 @@ const Home = () => {
                 }
               }}
             />
-          </div>
-        )}
+          )}
+        </div>
       </div>
     </>
   );
