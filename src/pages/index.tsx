@@ -3,7 +3,15 @@ import { Line } from 'react-chartjs-2';
 import Head from 'next/head';
 import Webcam from 'react-webcam';
 import { ChartDataSets } from 'chart.js';
-import { image, browser, tidy, dispose } from '@tensorflow/tfjs';
+import {
+  image,
+  browser,
+  tidy,
+  dispose,
+  cumsum,
+  reshape
+} from '@tensorflow/tfjs';
+import Fili from 'fili';
 import Header from '../components/header';
 import Research from '../components/research';
 import styles from '../styles/Home.module.scss';
@@ -37,7 +45,7 @@ const Home = () => {
     rppg: []
   });
   const refCountDown = React.useRef(30);
-  const [countDown, setCondown] = useState(30);
+  const [countDown, setCountDown] = useState(30);
 
   useEffect(
     () => () => {
@@ -49,7 +57,7 @@ const Home = () => {
         clearInterval(coutdownIntervalId.current);
       }
     },
-    [intervalId]
+    []
   );
 
   useEffect(
@@ -65,7 +73,7 @@ const Home = () => {
     await postprocessor.loadModel();
     intervalId.current = setInterval(capture, 30);
     coutdownIntervalId.current = setInterval(() => {
-      setCondown(prevCount => prevCount - 1);
+      setCountDown(prevCount => prevCount - 1);
       refCountDown.current -= 1;
       if (refCountDown.current === 0) {
         plotGraph();
@@ -85,6 +93,8 @@ const Home = () => {
     }
     preprocessor.stopProcess();
     tensorStore.reset();
+    setCountDown(30);
+    refCountDown.current = 30;
     setRecording(false);
   };
 
@@ -115,11 +125,24 @@ const Home = () => {
 
   const plotGraph = () => {
     const pltData = tensorStore.rppgPltData;
+    const iirCalculator = new Fili.CalcCascades();
+    const iirFilterCoeffs = iirCalculator.bandpass({
+      order: 1, // cascade 3 biquad filters (max: 12)
+      characteristic: 'butterworth',
+      Fs: 30, // sampling frequency
+      Fc: 1.625, // (2.5-0.75) / 2 + 0.75, 2.5 --> 150/60, 0.75 --> 45/60
+      BW: 1.75, // 2.5 - 0.75 = 1.75
+      gain: 0, // gain for peak, lowshelf and highshelf
+      preGain: false // adds one constant multiplication for highpass and lowpass
+    });
+    const iirFilter = new Fili.IirFilter(iirFilterCoeffs);
     if (pltData) {
+      const rppgCumsum = cumsum(reshape(pltData, [-1, 1]), 0).dataSync();
+      const result = iirFilter.filtfilt(rppgCumsum);
       const labels = Array.from(pltData.keys()).map(i => i.toString());
       setCharData({
         labels,
-        rppg: pltData
+        rppg: result
       });
     }
   };
@@ -166,37 +189,37 @@ const Home = () => {
               screenshotFormat="image/jpeg"
             />
           </div>
-          {!isRecording && !!charData.rppg.length && (
-            <Line
-              data={plotData}
-              width={1200}
-              height={300}
-              options={{
-                responsive: false,
-                animation: {
-                  duration: 0
-                },
-                scales: {
-                  yAxes: [
-                    {
-                      ticks: {
-                        suggestedMin: -5,
-                        suggestedMax: 5,
-                        display: false
+          <div>
+            {!isRecording && !!charData.rppg.length && (
+              <Line
+                data={plotData}
+                width={1200}
+                height={300}
+                options={{
+                  responsive: false,
+                  animation: {
+                    duration: 0
+                  },
+                  scales: {
+                    yAxes: [
+                      {
+                        ticks: {
+                          display: false
+                        }
                       }
-                    }
-                  ],
-                  xAxes: [
-                    {
-                      ticks: {
-                        display: false
+                    ],
+                    xAxes: [
+                      {
+                        ticks: {
+                          display: false
+                        }
                       }
-                    }
-                  ]
-                }
-              }}
-            />
-          )}
+                    ]
+                  }
+                }}
+              />
+            )}
+          </div>
         </div>
       </div>
     </>
