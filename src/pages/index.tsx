@@ -18,6 +18,7 @@ import styles from '../styles/Home.module.scss';
 import tensorStore from '../lib/tensorStore';
 import Preprocessor from '../lib/preprocessor';
 import Posprocessor from '../lib/posprocessor';
+import { BATCHSIZE } from '../constant';
 
 const postprocessor = new Posprocessor(tensorStore);
 const preprocessor = new Preprocessor(tensorStore, postprocessor);
@@ -138,7 +139,9 @@ const Home = () => {
     const iirFilter = new Fili.IirFilter(iirFilterCoeffs);
     if (pltData) {
       const rppgCumsum = cumsum(reshape(pltData, [-1, 1]), 0).dataSync();
-      const result = iirFilter.filtfilt(rppgCumsum);
+      const result = iirFilter
+        .filtfilt(rppgCumsum)
+        .slice(0, rppgCumsum.length - BATCHSIZE);
       const labels = Array.from(pltData.keys()).map(i => i.toString());
       setCharData({
         labels,
