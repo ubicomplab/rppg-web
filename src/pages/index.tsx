@@ -192,38 +192,36 @@ const Home = () => {
               screenshotFormat="image/jpeg"
             />
           </div>
-          <div>
-            {!isRecording && !!charData.rppg.length && (
-              <Line
-                data={plotData}
-                width={1200}
-                height={300}
-                options={{
-                  responsive: false,
-                  animation: {
-                    duration: 0
-                  },
-                  scales: {
-                    yAxes: [
-                      {
-                        ticks: {
-                          display: false
-                        }
-                      }
-                    ],
-                    xAxes: [
-                      {
-                        ticks: {
-                          display: false
-                        }
-                      }
-                    ]
-                  }
-                }}
-              />
-            )}
-          </div>
         </div>
+        {!isRecording && !!charData.rppg.length && (
+          <Line
+            data={plotData}
+            width={1200}
+            height={300}
+            options={{
+              responsive: false,
+              animation: {
+                duration: 0
+              },
+              scales: {
+                yAxes: [
+                  {
+                    ticks: {
+                      display: false
+                    }
+                  }
+                ],
+                xAxes: [
+                  {
+                    ticks: {
+                      display: false
+                    }
+                  }
+                ]
+              }
+            }}
+          />
+        )}
       </div>
     </>
   );
