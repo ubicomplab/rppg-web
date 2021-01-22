@@ -1,0 +1,8 @@
+version: '3'
+services:
+  web:
+    build: .
+    ports:
+      - "127.0.0.1:8595:80"
+    restart: always
+

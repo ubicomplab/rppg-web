@@ -1,0 +1,50 @@
+stages:
+- deploy
+
+deploy_research_test:
+  stage: deploy
+  script:
+    - docker-compose up -d --build
+  environment:
+    name: research test
+    url: https://vitals-research.cs.washington.edu/
+  tags:
+    - lab-docker-test
+  only:
+    - branches
+
+gitdeploy_instr_test:
+  stage: deploy
+  script:
+    - docker-compose up -d --build
+  environment:
+    name: insr test
+    url: https://insr-test-research.cs.washington.edu/
+  tags:
+    - lab-instr-docker-test
+  only:
+    - branches
+
+gitdeploy_admin_test:
+  stage: deploy
+  script:
+    - docker-compose up -d --build
+  environment:
+    name: admin test
+    url: https://admin-test-research.cs.washington.edu/
+  tags:
+    - lab-admin-docker-test
+  only:
+    - branches
+
+deploy_research_prod:
+  stage: deploy
+  script:
+    - docker-compose up -d --build
+  environment:
+    name: research prod
+    url: https://vitals.cs.washington.edu/
+  tags:
+    - lab-docker-prod
+  only:
+    - tags
