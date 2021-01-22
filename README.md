@@ -10,9 +10,9 @@ This respository is a web form demo for the research paper [Multi-Task Temporal 
 You can visit the website link [here](https://vitals.cs.washington.edu/) to see the live demo.
 
 Instructions:
-1. Please allow the camera access 
-2. After that, we suggest you to put your face inside the red square to get a better result.
-3. The result will appear below after 30 seconds. 
+1. Please allow the camera access
+2. After that, we suggest you to put your face inside the red square
+3. The result will be shown after 30 seconds.
 
 ## Run in local
 
