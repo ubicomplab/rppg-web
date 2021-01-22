@@ -1,7 +1,9 @@
 # Multi-Task Temporal Shift Attention Networks for On-Device Contactless Vitals Measurement
 
 
-This respository is a web form demo for the research paper [Multi-Task Temporal Shift Attention Networks for On-Device Contactless Vitals Measurement](https://ubicomplab.cs.washington.edu/pdfs/mtts_can.pdf).
+This respository is a web form demo for the research paper [Multi-Task Temporal Shift Attention Networks for On-Device Contactless Vitals Measurement](https://papers.nips.cc/paper/2020/file/e1228be46de6a0234ac22ded31417bc7-Paper.pdf). The paper is accepted in NeurIPS 2020.
+
+
 
 ## Demo
 
