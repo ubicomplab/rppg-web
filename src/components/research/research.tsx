@@ -17,7 +17,7 @@ const Research = () => (
     <a href="https://www.microsoft.com/en-us/research/people/damcduff/">
      Daniel McDuff
     </a>
-    <a href="https://ubicomplab.cs.washington.edu/pdfs/mtts_can.pdf">
+    <a href="https://papers.nips.cc/paper/2020/file/e1228be46de6a0234ac22ded31417bc7-Paper.pdf">
       <h3>Download PDF</h3>
     </a>
   </div>
