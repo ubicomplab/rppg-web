@@ -1,7 +1,7 @@
 # Multi-Task Temporal Shift Attention Networks for On-Device Contactless Vitals Measurement
 
 
-This respository is a web form demo for the research paper [Multi-Task Temporal Shift Attention Networks for On-Device Contactless Vitals Measurement](https://papers.nips.cc/paper/2020/file/e1228be46de6a0234ac22ded31417bc7-Paper.pdf). The paper is accepted in NeurIPS 2020.
+This respository is a web form demo for the research paper [Multi-Task Temporal Shift Attention Networks for On-Device Contactless Vitals Measurement](https://papers.nips.cc/paper/2020/file/e1228be46de6a0234ac22ded31417bc7-Paper.pdf). The paper has been accepted to NeurIPS 2020.
 
 <img width="1096" alt="paper" src="https://user-images.githubusercontent.com/52882728/105437924-fe06aa00-5c2f-11eb-81ec-9d0664cc432b.png">
 
