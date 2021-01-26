@@ -14,6 +14,7 @@ import {
 import Fili from 'fili';
 import Header from '../components/header';
 import Research from '../components/research';
+import Contributor from '../components/contributor';
 import styles from '../styles/Home.module.scss';
 import tensorStore from '../lib/tensorStore';
 import Preprocessor from '../lib/preprocessor';
@@ -170,6 +171,7 @@ const Home = () => {
       </Head>
       <Header />
       <div className={styles.contentContainer}>
+        <Contributor />
         <Research />
         <p>{countDown}</p>
         {!isRecording && (
