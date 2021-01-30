@@ -172,8 +172,7 @@ const Home = () => {
       <Header />
       <div className={styles.contentContainer}>
         <Contributor />
-        <Research />
-        <p style={{fontSize:"20px"}}>{countDown}</p>
+        <p className={styles.countdown}>{countDown}</p>
         {!isRecording && (
           <button
             className={styles.recordingButton}
@@ -225,6 +224,13 @@ const Home = () => {
             }}
           />
         )}
+        <Research />
+        <img
+          src="/images/UWlogo5.png"
+          width="500"
+          height="70"
+          className={styles.UWlogo}
+        />
       </div>
     </>
   );
