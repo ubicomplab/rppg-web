@@ -5,6 +5,7 @@ This respository is a web form demo for the research paper [Multi-Task Temporal 
 
 <img width="1096" alt="paper" src="https://user-images.githubusercontent.com/52882728/105437924-fe06aa00-5c2f-11eb-81ec-9d0664cc432b.png">
 
+You may visit [here](https://github.com/xliucs/MTTS-CAN) to checkout their research source code.
 
 ## Demo
 
