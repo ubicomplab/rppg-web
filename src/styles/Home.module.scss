@@ -1,9 +1,11 @@
 .recordingButton {
     display: block;
-    padding: 8px;
-    background-color: white;
-    border: 0.5px solid grey;
-    border-radius: 8px;
+    padding: 20px;
+    color: white;
+    font-size: 15px;
+    background-color: #4b2e83;
+    border: 0.5px solid white;
+    border-radius: 20px;
     margin: 8px;
     &:focus {
        outline: none;

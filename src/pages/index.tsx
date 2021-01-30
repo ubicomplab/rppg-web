@@ -173,7 +173,7 @@ const Home = () => {
       <div className={styles.contentContainer}>
         <Contributor />
         <Research />
-        <p>{countDown}</p>
+        <p style={{fontSize:"20px"}}>{countDown}</p>
         {!isRecording && (
           <button
             className={styles.recordingButton}
@@ -183,6 +183,7 @@ const Home = () => {
             Start Recording
           </button>
         )}
+        <h4>*Please place your face inside of the red box*</h4>
         <div className={styles.innerContainer}>
           <div className={styles.webcam}>
             <Webcam
