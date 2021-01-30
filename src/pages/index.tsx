@@ -227,9 +227,8 @@ const Home = () => {
         <Research />
         <img
           src="/images/UWlogo5.png"
-          width="500"
-          height="70"
-          className={styles.UWlogo}
+          width={500}
+          height={70}       
         />
       </div>
     </>

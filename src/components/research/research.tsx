@@ -1,7 +1,8 @@
 import React from 'react';
+import styles from './research.module.scss';
 
 const Research = () => (
-  <div>
+  <div className={styles.ResearchSection}>
     <h3>
       <b>Research Paper</b>
     </h3>
