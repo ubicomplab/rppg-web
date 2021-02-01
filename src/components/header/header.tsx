@@ -19,6 +19,11 @@ const Header = () => (
         className="UW-text"
       />
     </a>
+    <a 
+      className={styles.github}
+      href="https://github.com/ubicomplab/rppg-web">
+        GITHUB
+    </a>
   </header>
 );
 
