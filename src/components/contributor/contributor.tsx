@@ -4,7 +4,7 @@ import styles from './contributor.module.scss';
 const Contributor = () => (
   <div>
     <h3 className={styles.textCenter}>
-      <b>Built by engineers:</b>        
+      <b>Built by engineers:</b>       
     </h3>
     <div className={styles.gallery}>
         <div className={styles.item}>
