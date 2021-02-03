@@ -3,7 +3,7 @@ import styles from './header.module.scss';
 
 const Header = () => (
   <header className={styles.header}>
-    <a href="http://www.washington.edu/">
+    <a href="http://cs.washington.edu/" target="_blank">
       <img
         src="/images/UWlogo3.png"
         alt="UW Logo"
@@ -21,7 +21,7 @@ const Header = () => (
     </a>
     <a 
       className={styles.github}
-      href="https://github.com/ubicomplab/rppg-web">
+      href="https://github.com/ubicomplab/rppg-web" target="_blank">
         GITHUB
     </a>
   </header>

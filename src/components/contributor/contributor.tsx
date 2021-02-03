@@ -8,7 +8,7 @@ const Contributor = () => (
     </h3>
     <div className={styles.gallery}>
         <div className={styles.item}>
-            <a href="https://www.linkedin.com/in/juconghe/">
+            <a href="https://www.linkedin.com/in/juconghe/" target="_blank">
                 <img 
                     src="/images/Jucong.jpeg"
                     alt="Jucong He"
@@ -16,12 +16,12 @@ const Contributor = () => (
                     height="130"
                 />
             </a>
-            <a href="https://www.linkedin.com/in/juconghe/"> 
+            <a href="https://www.linkedin.com/in/juconghe/" target="_blank">  
                 <p>Jucong He</p>
             </a>
         </div>
         <div className={styles.item}>
-            <a href="https://www.linkedin.com/in/sophie-nie/">
+            <a href="https://www.linkedin.com/in/sophie-nie/" target="_blank">
                 <img 
                     src="/images/Sophie.jpeg"
                     alt="Sophie Nie"
@@ -29,7 +29,7 @@ const Contributor = () => (
                     height="130"
                 />
             </a>
-            <a href="https://www.linkedin.com/in/sophie-nie/"> 
+            <a href="https://www.linkedin.com/in/sophie-nie/" target="_blank"> 
                 <p>Sophie Nie</p>
             </a>
         </div>

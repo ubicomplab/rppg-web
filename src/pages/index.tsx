@@ -182,7 +182,7 @@ const Home = () => {
             Start Recording
           </button>
         )}
-        <h4>*Please place your face inside of the red box*</h4>
+        <h4>*Please place your face inside of the red box and Keep Stationary for 30 seconds*</h4>
         <div className={styles.innerContainer}>
           <div className={styles.webcam}>
             <Webcam
@@ -225,11 +225,13 @@ const Home = () => {
           />
         )}
         <Research />
+        <a href="http://cs.washington.edu/" target="_blank">
         <img
           src="/images/UWlogo5.png"
           width={500}
           height={70}       
         />
+         </a>
       </div>
     </>
   );
