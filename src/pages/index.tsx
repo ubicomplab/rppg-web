@@ -175,20 +175,18 @@ const Home = () => {
       <div>
         <Contributor />
         <div className={styles.contentContainer}>
-          <p className={styles.countdown}>{countDown}</p>
+        <h3>This is a demo for camera-based remote PPG (Pulse) sensing. The recorded video won't be uploaded to cloud. </h3>
+        <h4 style={{color: 'red'}}>Please place your face inside of the red box and keep stationary for 30 seconds</h4>
           {!isRecording && (
             <button
               className={styles.recordingButton}
               onClick={startRecording}
               type="button"
             >
-              Start Recording
+              Start the Demo
             </button>
           )}
-          <h4>
-            *Please place your face inside of the red box and Keep Stationary
-            for 30 seconds*
-          </h4>
+          <p className={styles.countdown}>{countDown}</p>
           <div className={styles.innerContainer}>
             <div className={styles.webcam}>
               <Webcam
