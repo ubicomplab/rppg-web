@@ -143,7 +143,9 @@ const Home = () => {
       const result = iirFilter
         .filtfilt(rppgCumsum)
         .slice(0, rppgCumsum.length - 60);
-      const labels = Array.from(pltData.keys()).map(i => i.toString());
+      const labels = Array.from(pltData.keys())
+        .map(i => i.toString())
+        .slice(0, rppgCumsum.length - 60);
       setCharData({
         labels,
         rppg: result
