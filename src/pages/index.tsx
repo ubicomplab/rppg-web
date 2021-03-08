@@ -168,72 +168,71 @@ const Home = () => {
       <Head>
         <title>rPPG Web Demo</title>
         <link rel="icon" href="/images/icon.png" />
-
       </Head>
       <Header />
-      <div className={styles.contentContainer}>
+      <div>
         <Contributor />
-        <h3>This is a demo for camera-based remote PPG (Pulse) sensing. The recorded video won't be uploaded to cloud. </h3>
-        <h4>*Please place your face inside of the red box and keep stationary for 30 seconds*</h4>
-        {!isRecording && (
-          <button
-            className={styles.recordingButton}
-            onClick={startRecording}
-            type="button"
-          >
-            Start the Demo
-          </button>
-        )}
-        <p className={styles.countdown}>{countDown}</p>
-        <div className={styles.innerContainer}>
-          <div className={styles.webcam}>
-            <Webcam
-              width={500}
-              height={500}
-              mirrored
-              audio={false}
-              ref={webcamRef}
-              screenshotFormat="image/jpeg"
-            />
+        <div className={styles.contentContainer}>
+          <p className={styles.countdown}>{countDown}</p>
+          {!isRecording && (
+            <button
+              className={styles.recordingButton}
+              onClick={startRecording}
+              type="button"
+            >
+              Start Recording
+            </button>
+          )}
+          <h4>
+            *Please place your face inside of the red box and Keep Stationary
+            for 30 seconds*
+          </h4>
+          <div className={styles.innerContainer}>
+            <div className={styles.webcam}>
+              <Webcam
+                width={500}
+                height={500}
+                mirrored
+                audio={false}
+                ref={webcamRef}
+                screenshotFormat="image/jpeg"
+              />
+            </div>
           </div>
+          {!isRecording && !!charData.rppg.length && (
+            <Line
+              data={plotData}
+              width={1200}
+              height={300}
+              options={{
+                responsive: false,
+                animation: {
+                  duration: 0
+                },
+                scales: {
+                  yAxes: [
+                    {
+                      ticks: {
+                        display: false
+                      }
+                    }
+                  ],
+                  xAxes: [
+                    {
+                      ticks: {
+                        display: false
+                      }
+                    }
+                  ]
+                }
+              }}
+            />
+          )}
+          <Research />
+          <a href="http://cs.washington.edu/" target="_blank">
+            <img src="/images/UWlogo5.png" alt="" width={500} height={70} />
+          </a>
         </div>
-        {!isRecording && !!charData.rppg.length && (
-          <Line
-            data={plotData}
-            width={1200}
-            height={300}
-            options={{
-              responsive: false,
-              animation: {
-                duration: 0
-              },
-              scales: {
-                yAxes: [
-                  {
-                    ticks: {
-                      display: false
-                    }
-                  }
-                ],
-                xAxes: [
-                  {
-                    ticks: {
-                      display: false
-                    }
-                  }
-                ]
-              }
-            }}
-          />
-        )}
-        <Research />
-        <a href="http://cs.washington.edu/" target="_blank">
-        <img
-          src="/images/UWlogo5.png"
-          width={500}
-          height={70}       
-        />
-         </a>
       </div>
     </>
   );
