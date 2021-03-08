@@ -19,7 +19,6 @@ import styles from '../styles/Home.module.scss';
 import tensorStore from '../lib/tensorStore';
 import Preprocessor from '../lib/preprocessor';
 import Posprocessor from '../lib/posprocessor';
-import { BATCHSIZE } from '../constant';
 
 const postprocessor = new Posprocessor(tensorStore);
 const preprocessor = new Preprocessor(tensorStore, postprocessor);
@@ -172,11 +171,17 @@ const Home = () => {
         <link rel="icon" href="/images/icon.png" />
       </Head>
       <Header />
-      <div>
+      <div className={styles.homeContainer}>
         <Contributor />
         <div className={styles.contentContainer}>
-        <h3>This is a demo for camera-based remote PPG (Pulse) sensing. The recorded video won't be uploaded to cloud. </h3>
-        <h4 style={{color: 'red'}}>Please place your face inside of the red box and keep stationary for 30 seconds</h4>
+          <h3>
+            This is a demo for camera-based remote PPG (Pulse) sensing. The
+            recorded video will not be uploaded to cloud.
+          </h3>
+          <h4 style={{ color: 'red' }}>
+            Please place your face inside of the red box and keep stationary for
+            30 seconds
+          </h4>
           {!isRecording && (
             <button
               className={styles.recordingButton}

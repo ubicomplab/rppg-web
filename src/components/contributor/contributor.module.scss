@@ -19,5 +19,6 @@
     }
 
 .gallery{
-    width:65px;
-    }
+    display: flex;
+    flex-direction: column;
+}
