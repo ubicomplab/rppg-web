@@ -132,8 +132,8 @@ const Home = () => {
       order: 1, // cascade 3 biquad filters (max: 12)
       characteristic: 'butterworth',
       Fs: 30, // sampling frequency
-      Fc: 1.625, // (2.5-0.75) / 2 + 0.75, 2.5 --> 150/60, 0.75 --> 45/60
-      BW: 1.75, // 2.5 - 0.75 = 1.75
+      Fc: 1.375, // (2.5-0.75) / 2 + 0.75, 2.5 --> 150/60, 0.75 --> 45/60 # 1.625
+      BW: 1.25, // 2.5 - 0.75 = 1.75
       gain: 0, // gain for peak, lowshelf and highshelf
       preGain: false // adds one constant multiplication for highpass and lowpass
     });
@@ -142,7 +142,7 @@ const Home = () => {
       const rppgCumsum = cumsum(reshape(pltData, [-1, 1]), 0).dataSync();
       const result = iirFilter
         .filtfilt(rppgCumsum)
-        .slice(0, rppgCumsum.length - BATCHSIZE);
+        .slice(0, rppgCumsum.length - 60);
       const labels = Array.from(pltData.keys()).map(i => i.toString());
       setCharData({
         labels,
@@ -166,23 +166,25 @@ const Home = () => {
   return (
     <>
       <Head>
-        <title>RPPG</title>
-        <link rel="icon" href="/favicon.ico" />
+        <title>rPPG Web Demo</title>
+        <link rel="icon" href="/images/icon.png" />
+
       </Head>
       <Header />
       <div className={styles.contentContainer}>
         <Contributor />
-        <p className={styles.countdown}>{countDown}</p>
+        <h3>This is a demo for camera-based remote PPG (Pulse) sensing. The recorded video won't be uploaded to cloud. </h3>
+        <h4>*Please place your face inside of the red box and keep stationary for 30 seconds*</h4>
         {!isRecording && (
           <button
             className={styles.recordingButton}
             onClick={startRecording}
             type="button"
           >
-            Start Recording
+            Start the Demo
           </button>
         )}
-        <h4>*Please place your face inside of the red box and Keep Stationary for 30 seconds*</h4>
+        <p className={styles.countdown}>{countDown}</p>
         <div className={styles.innerContainer}>
           <div className={styles.webcam}>
             <Webcam
