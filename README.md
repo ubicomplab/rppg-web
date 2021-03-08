@@ -1,19 +1,16 @@
-# Multi-Task Temporal Shift Attention Networks for On-Device Contactless Vitals Measurement
-
+# A Web Demo for Camera-Based Physiological Sensing
 
 This respository is a web form demo for the research paper [Multi-Task Temporal Shift Attention Networks for On-Device Contactless Vitals Measurement](https://papers.nips.cc/paper/2020/file/e1228be46de6a0234ac22ded31417bc7-Paper.pdf). The paper has been accepted to NeurIPS 2020.
-
-<img width="1096" alt="paper" src="https://user-images.githubusercontent.com/52882728/105437924-fe06aa00-5c2f-11eb-81ec-9d0664cc432b.png">
 
 You may visit [here](https://github.com/xliucs/MTTS-CAN) to checkout their research source code.
 
 ## Demo
 
-You can visit the website link [here](https://vitals.cs.washington.edu/) to see the live demo.
+**Try out our live demo via link [here](https://vitals.cs.washington.edu/).**
 
 Instructions:
 1. Please allow the camera access
-2. After that, we suggest you to put your face inside the red square
+2. Place your face centered the red square
 3. The result will be shown after 30 seconds.
 
 ## Run in local
